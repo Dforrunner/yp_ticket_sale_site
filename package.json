@@ -1,0 +1,30 @@
+{
+  "name": "yp_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-pg-simple": "^7.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "express-session": "^1.17.2",
+    "moment": "^2.29.1",
+    "mysql2": "^2.3.3",
+    "nodemon": "^2.0.15",
+    "passport": "^0.5.2",
+    "passport-local": "^1.0.0",
+    "pg": "^8.7.3",
+    "stripe": "^8.201.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.0"
+  }
+}
