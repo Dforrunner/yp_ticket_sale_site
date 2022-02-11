@@ -1,0 +1,176 @@
+doctype html
+html(lang='en')
+head
+    meta(charset="utf-8")
+    title=title
+    style.
+        #ticket-div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        #ticket-div p {
+            margin-bottom: 3px;
+        }
+
+        #ticket-div p:first-child {
+            font-size: 16px;
+            font-weight: lighter;
+            color: #3b3b40;
+        }
+
+        #ticket-div h2 {
+            font-weight: normal;
+            font-size: 19px;
+            padding: 2px;
+            margin: 0;
+        }
+
+        #ticket-div p:nth-child(3) {
+            font-size: 17px;
+            font-weight: lighter;
+            color: #363639;
+        }
+
+        #ticket-div p:nth-child(4) {
+            font-size: 14px;
+            font-weight: lighter;
+            color: #363639;
+        }
+
+        #ticket-div p:nth-child(5) {
+            margin-top: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: lighter;
+            color: #363639;
+        }
+
+        #ticket-div img {
+            margin-bottom: 10px;
+        }
+
+        #ticket-div a {
+            text-decoration: none;
+            border: 2px solid #e5bf00;
+            padding: 7px 20px 7px 20px;
+            color: #eed706;
+            font-size: 16px;
+            margin: 8px;
+        }
+
+        #header {
+            background-color: gold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #38383b;
+            height: 100px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: lighter;
+        }
+
+        h3 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        #info p {
+            font-size: 12px;
+            margin-bottom: 1px;
+        }
+
+        .footer {
+            background-color: #2e2d2b;
+            color: white;
+            font-size: 14px;
+            font-weight: lighter;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 14px;
+        }
+
+        #info {
+            margin-left: 10px;
+        }
+
+        #info h2 {
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .footer a {
+            color: cyan !important;
+        }
+
+
+body
+    div(id="header")
+        h1 Thank you for purchasing a ticket!
+    div(id='ticket-div')
+        p You're going to
+        h2 Young Professionals of Saint Louis 5K Ball
+        p #{date_time}
+        p @#{venue}
+        p Please use the following code to check in at the event
+        img(src=qrUrl alt="TICKET QR")
+        a(href="https://ypstl.com" target="_blank") EVENT SITE
+        a(href='https://www.facebook.com/groups/youngprofessionalsofstlouis' target="_blank") FACEBOOK PAGE
+
+    div(id="info")
+        h2 Transaction Details
+        h3 Buyer:
+        p
+            b Name:#{' '}
+            span #{firstname} #{lastname}
+
+        br
+
+        h3 Order Info:
+        p
+            b Title:#{' '}
+            span=product
+        p
+            b Quantity:#{' '}
+            span=qty
+        p
+            b Purchase Price:#{' '}
+            span $#{price}
+
+        if tipped
+            p
+                b Donation Amount:#{' '}
+                span $#{tipAmount} - Thank you! :)
+
+        p
+            b Total:#{' '}
+            span $#{total}
+
+        br
+
+        h3 Event Info:
+        p
+            b Event Date:#{' '}
+            span=date_time
+        p
+            b Location:#{' '}
+            span=venue
+
+    br
+
+    div(class='footer')
+        p When you arrive at the event just show us a picture of your ticket and we'll scan you in.
+        p If you have any questions or concerns please reach out to us @#{' '}
+            a(href = "mailto:info@ypstl.com") info@ypstl.com

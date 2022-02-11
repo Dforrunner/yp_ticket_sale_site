@@ -225,13 +225,6 @@ body {
   }
 }
 
-@media only screen and (max-width: 600px) {
-  form {
-    width: 80vw;
-    min-width: initial;
-  }
-}
-
 .lds-ring {
   display: inline-block;
   position: relative;
@@ -264,6 +257,45 @@ body {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+
+
+
+.slideInLeft {
+  animation-duration: 1s;
+  animation-name: slideInLeft;
+}
+
+.slideInRight {
+  animation-duration: 1s;
+  animation-name: slideInRight;
+}
+
+@keyframes slideInRight {
+  from {
+    -webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
 }
 

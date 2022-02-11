@@ -1,81 +1,47 @@
-import React, {useContext} from 'react';
-import {styled, createTheme, ThemeProvider} from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import MuiDrawer from '@mui/material/Drawer';
-import Box from '@mui/material/Box';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import {mainListItems, secondaryListItems} from './listItems';
-import Chart from './Chart';
-import Deposits from './Deposits';
-import Orders from './Orders';
+import {useState, cloneElement, useContext, useEffect} from 'react';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import {createTheme} from "@mui/material/styles";
+import {ThemeProvider} from "@emotion/react";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import * as React from "react";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import List from "@mui/material/List";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import {AuthContext} from "./Auth";
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {TextField} from "@mui/material";
+import Loader from "./Loader";
+import {DataGrid} from '@mui/x-data-grid';
 
-function Copyright(props) {
+const Navbar = ({tab, setTab, setPrevTab}) => {
+
     return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            Copyright © Young Professionals of Saint Louis 2022.
-        </Typography>
+        <div className='w-full fixed bottom-0 md:top-0 h-[56px]'>
+            <BottomNavigation
+                showLabels
+                value={tab}
+                onChange={(event, newValue) => {
+                    setPrevTab(tab);
+                    setTab(newValue);
+                }}
+            >
+                <BottomNavigationAction label="Dashboard" icon={<DashboardIcon/>}/>
+                <BottomNavigationAction label="Ticket Scan" icon={<PhotoCameraIcon/>}/>
+                <BottomNavigationAction label="Settings" icon={<SettingsIcon/>}/>
+            </BottomNavigation>
+        </div>
     );
 }
-
-const drawerWidth = 240;
-
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({theme, open}) => ({
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    }),
-}));
-
-const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
-    ({theme, open}) => ({
-        '& .MuiDrawer-paper': {
-            position: 'relative',
-            whiteSpace: 'nowrap',
-            width: drawerWidth,
-            transition: theme.transitions.create('width', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-            boxSizing: 'border-box',
-            ...(!open && {
-                overflowX: 'hidden',
-                transition: theme.transitions.create('width', {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.leavingScreen,
-                }),
-                width: theme.spacing(7),
-                [theme.breakpoints.up('sm')]: {
-                    width: theme.spacing(9),
-                },
-            }),
-        },
-    }),
-);
 
 const mdTheme = createTheme({
     palette: {
@@ -83,138 +49,331 @@ const mdTheme = createTheme({
     },
 });
 
-function DashboardContent() {
-    const [open, setOpen] = React.useState(true);
-    const auth = useContext(AuthContext);
-    const navigate = useNavigate();
+const CustomListItem = ({icon, text, onclick}) =>
+    <ListItemButton onClick={onclick} style={{height: '60px', padding: 0, margin: 0}}>
+        <ListItemIcon>
+            {cloneElement(icon, {style: {color: "black", marginLeft: 20, marginTop: 10}})}
+        </ListItemIcon>
+        <div className='flex justify-between items-center w-full border-b border-gray-400 py-3 -mb-1'>
+            <ListItemText primary={text} style={{paddingLeft: 2}}/>
+            <ArrowForwardIosIcon style={{width: '15px', color: '#646464', marginRight: 10}}/>
+        </div>
+
+    </ListItemButton>
+
+const slideAnimation = (index, prevTab) => {
+    if (index === prevTab) return '';
+    return index > prevTab ? 'slideInRight' : 'slideInLeft'
+}
+
+const DashTab = ({index, activeTab}) => {
+    const [data, setData] = useState([]);
+    const [total, setTotal] = useState(0)
+    const columns = [
+        {field: 'id', headerName: 'ID', width: 70, type: 'number'},
+        {
+            field: 'fullName',
+            headerName: 'Full name',
+            description: 'This column has a value getter and is not sortable.',
+            sortable: false,
+            width: 160,
+            valueGetter: (params) =>
+                `${params.row.firstname} ${params.row.lastname}`,
+        },
+        {field: 'qty', headerName: 'QTY', type: 'number', width: 60},
+        {field: 'price', headerName: '@Price', type: 'number', width: 80},
+        {field: 'tip', headerName: 'Donation', type: 'number', width: 90},
+        {field: 'total_paid', headerName: 'Total Paid', type: 'number', width:90},
+        {field: 'email', headerName: 'Email', width: 200},
+        {field: 'checked_in', headerName: 'Checked In'},
+        {field: 'checked_in_by', headerName: 'By'},
+    ];
+
+    useEffect(() => {
+        fetch('/transactions')
+            .then(res => res.json())
+            .then(data => {
+                setData(data)
+                let sum = 0;
+
+                data.map(i => sum += i.total_paid)
+                setTotal(sum)
+            })
+            .catch(console.error)
+    }, []);
+
+    return (
+        <div className={`${slideAnimation(index, activeTab)}  w-full md:mt-10`}>
+            <div className='flex flex-col p-2'>
+                <div className='flex mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
+                    <p className='text-2xl'>Total Sales:</p>
+                    <h1 className='text-4xl text-green-300'>${total}</h1>
+                </div>
+
+                <div className='bg-[#252525] mx-1 my-3 rounded h-[600px]'>
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        pageSize={9}
+                        rowsPerPageOptions={[5]}
+                    />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const ScanTab = ({index, prevTab}) => {
+    return (
+        <div className={`${slideAnimation(index, prevTab)}  w-full`}>Scanner</div>
+    )
+}
+
+const CustomInput = ({...rest}) =>
+    <div className='mt-4'>
+        <TextField
+            {...rest}
+            fullWidth={true}
+        />
+    </div>
+
+const AccountTab = ({index, prevTab, setTab, user}) => {
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [msg, setMsg] = useState('');
+    const [confirmErr, setConfirmErr] = useState(false);
+    const [usernameErr, setUserNameErr] = useState(false);
+    const [passErr, setPassErr] = useState(false);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (isLoading) return;
+
+        const getVal = (name) => e.target[name].value;
+
+        const formData = {
+            currentUsername: user.username,
+            username: getVal('username'),
+            firstname: getVal('firstname'),
+            lastname: getVal('lastname'),
+            currentPass: getVal('currentPass'),
+            newPass: getVal('newPass'),
+            confirmPass: getVal('confirmPass')
+        }
+
+        if (!formData.currentPass) {
+            setPassErr(true);
+            setMsg('Current password is required to save changes')
+            return;
+        }
+
+        setPassErr(false);
+
+        if (!formData.username || formData.username.lastname < 2) {
+            setUserNameErr(true);
+            setMsg('Username required')
+            return;
+        }
+
+        setUserNameErr(false);
+
+        if (formData.newPass !== formData.confirmPass) {
+            setMsg('Passwords must match');
+            setConfirmErr(true)
+            return;
+        }
+
+        setConfirmErr(false);
+        setMsg('');
+        setIsLoading(true)
+
+        const rmMsg = () => {
+            const timer = setTimeout(() => {
+                setMsg('')
+                clearTimeout(timer);
+            }, 5000)
+        }
+
+        fetch('/updated-account', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(res => res.json())
+            .then(({error}) => {
+                setIsLoading(false);
+
+                if (error) {
+                    setMsg(error)
+                    return;
+                }
+                setMsg('Changes successfully saved!')
+                rmMsg();
+            })
+            .catch(err => console.log(err))
+
+    }
+
+    return (
+        <div className={`${slideAnimation(index, prevTab)}  w-full`}>
+            <div
+                className='flex items-center p-3 bg-[#121212] md:bg-[#595959] md:mt-4 h-[50px] cursor-pointer'
+                onClick={() => setTab(index - 1)}
+            >
+                <ArrowBackIcon/>
+                Back
+            </div>
+
+            <form onSubmit={handleSubmit} className='mt-5'>
+                <h2 className='pl-5 pt-5 '>User information</h2>
+
+                <div className='flex flex-col p-5 w-full'>
+                    <CustomInput
+                        label="Username"
+                        name='username'
+                        defaultValue={user.username}
+                        error={usernameErr}
+                    />
+                    <CustomInput
+                        label="First Name"
+                        name='firstname'
+                        defaultValue={user.firstname}
+                    />
+                    <CustomInput
+                        label="Last Name"
+                        name='lastname'
+                        defaultValue={user.lastname}
+                    />
+                </div>
+
+                <h2 className='pl-5 pt-5 '>Reset Password</h2>
+
+                <div className='flex flex-col p-5 w-full'>
+                    <CustomInput
+                        label="Current Password"
+                        name='currentPass'
+                        type='password'
+                        error={passErr}
+                    />
+
+                    <CustomInput
+                        label="New Password (Optional)"
+                        name='newPass'
+                        type='password'
+                    />
+                    <CustomInput
+                        label="Confirm Password (Optional)"
+                        name='confirmPass'
+                        type='password'
+                        error={confirmErr}
+                    />
+                </div>
+
+                <div className='flex justify-center items-center h-[40px]'>
+                    <p className='text-gray-400'>{msg}</p>
+                </div>
+                <div className='flex justify-center items-center bg-[#3071BB]
+                                hover:bg-[#3584DF] h-[50px] text-white m-5 rounded'>
+                    {isLoading
+                        ? <Loader/>
+                        : <button className='w-full h-full cursor-pointer' type='submit'>
+                            Save Changes
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+    )
+}
+
+const SettingsTab = ({index, prevTab, setTab, logout, navigate}) => {
 
     const handleLogout = () => {
-        auth.logout()
-            .then(_=> {
+        logout()
+            .then(_ => {
                 navigate('/admin')
             })
     }
 
-    const toggleDrawer = () => {
-        setOpen(!open);
-    };
+    return (
+        <div className={`${slideAnimation(index, prevTab)} w-full`}>
+            <div className='flex flex-col justify-start items-center'>
+                <div className='rounded-full p-5 bg-white mt-10'>
+                    <ManageAccountsIcon style={{fontSize: 80, color: 'black'}}/>
+                </div>
+                <h1 className='text-3xl mb-10 mt-3'>Mo Barut</h1>
+
+                <List className='w-[90%] rounded bg-gray-300 text-black overflow-hidden' style={{padding: 0}}>
+                    <CustomListItem
+                        icon={<AdminPanelSettingsIcon/>}
+                        text='Account'
+                        onclick={() => setTab(3)}
+                    />
+                    <CustomListItem
+                        icon={<LogoutIcon/>}
+                        text='Logout'
+                        onclick={handleLogout}
+                    />
+                </List>
+            </div>
+        </div>
+    )
+}
+
+const Dashboard = () => {
+    const [tab, setTab] = useState(0);
+    const [prevTab, setPrevTab] = useState(0)
+    const auth = useContext(AuthContext);
+    const navigate = useNavigate();
 
     return (
-        <ThemeProvider theme={mdTheme}>
-            <Box sx={{display: 'flex'}}>
-                <CssBaseline/>
-                <AppBar position="absolute" open={open}>
-                    <Toolbar
-                        sx={{
-                            pr: '24px', // keep right padding when drawer closed
-                        }}
-                    >
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={toggleDrawer}
-                            sx={{
-                                marginRight: '36px',
-                                ...(open && {display: 'none'}),
-                            }}
-                        >
-                            <MenuIcon/>
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            sx={{flexGrow: 1}}
-                        >
-                            Dashboard
-                        </Typography>
-                        <button
-                            className="block w-[100px] w-full bg-indigo-600 mt-4 py-2 rounded-2xl text-white font-semibold mb-2"
-                            onClick={handleLogout}
-                        >Logout
-                        </button>
+        <div className='min-h-screen overflow-hidden text-white md:mt-10'>
+            <ThemeProvider theme={mdTheme}>
 
-                    </Toolbar>
-                </AppBar>
+                <div>
+                    {tab === 0 &&
+                    <DashTab
+                        index={0}
+                        prevTab={prevTab}
+                    />}
 
-                <Drawer variant="permanent" open={open}>
-                    <Toolbar
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-end',
-                            px: [1],
-                        }}
-                    >
-                        <IconButton onClick={toggleDrawer}>
-                            <ChevronLeftIcon/>
-                        </IconButton>
-                    </Toolbar>
-                    <Divider/>
-                    <List component="nav">
-                        {mainListItems}
-                        <Divider sx={{my: 1}}/>
-                        {secondaryListItems}
-                    </List>
-                </Drawer>
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1,
-                        height: '100vh',
-                        overflow: 'auto',
-                    }}
-                >
-                    <Toolbar/>
-                    <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
-                        <Grid container spacing={3}>
-                            {/* Chart */}
-                            <Grid item xs={12} md={8} lg={9}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        height: 240,
-                                    }}
-                                >
-                                    <Chart/>
-                                </Paper>
-                            </Grid>
-                            {/* Recent Deposits */}
-                            <Grid item xs={12} md={4} lg={3}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        height: 240,
-                                    }}
-                                >
-                                    <Deposits/>
-                                </Paper>
-                            </Grid>
-                            {/* Recent Orders */}
-                            <Grid item xs={12}>
-                                <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
-                                    <Orders/>
-                                </Paper>
-                            </Grid>
-                        </Grid>
-                        <Copyright sx={{pt: 4}}/>
-                    </Container>
-                </Box>
-            </Box>
-        </ThemeProvider>
-    );
+                    {tab === 1 &&
+                    <ScanTab
+                        index={1}
+                        prevTab={prevTab}
+                    />}
+
+                    {tab === 2 &&
+                    <SettingsTab
+                        index={2}
+                        prevTab={prevTab}
+                        setTab={setTab}
+                        logout={auth.logout}
+                        navigate={navigate}
+                    />}
+
+                    {tab === 3 &&
+                    <AccountTab
+                        index={3}
+                        prevTab={prevTab}
+                        setTab={setTab}
+                        user={auth.user}
+                    />}
+
+                </div>
+
+                <Navbar
+                    tab={tab}
+                    setTab={setTab}
+                    setPrevTab={setPrevTab}
+                />
+            </ThemeProvider>
+        </div>
+
+    )
 }
 
-export default function Dashboard() {
-    return <DashboardContent/>;
-}
+export default Dashboard;

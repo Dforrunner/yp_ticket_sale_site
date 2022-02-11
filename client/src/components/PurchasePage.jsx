@@ -8,21 +8,8 @@ import {useLocation, Navigate} from 'react-router-dom'
 import Loader from "./Loader";
 import QRCode from 'qrcode.react';
 import {useReactToPrint} from "react-to-print";
-
+import InputField from "./InputField";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
-
-const InputField = ({style, ...rest}) =>
-    <div className='p-1 rounded w-full md:w-1/2'>
-        <TextField
-            {...rest}
-            style={{
-                width: '100%',
-                backgroundColor: 'white',
-                borderRadius: '5px',
-                ...style
-            }}
-        />
-    </div>
 
 const TipBtn = ({amount, setTip}) =>
     <button type='button'
@@ -526,7 +513,7 @@ const PurchasePage = () => {
         fetch('/payment-success', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data),
+            body: JSON.stringify({...data, userData: orderFormData, eventData: productData}),
         })
             .then(res => res.json())
             .then(({ticket}) => setTicketVal(ticket))

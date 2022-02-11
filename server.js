@@ -9,9 +9,10 @@ const stripe = require("stripe")(process.env.NODE_STRIPE_SK);
 const {query, db} = require('./db');
 const moment = require('moment');
 const {configPassport, ensureAuthenticated} = require('./auth');
+const bcrypt = require('bcryptjs');
+const sendEmail = require('./email');
 
 app.use(express.static("public"));
-
 configPassport(passport);
 
 app.use((req, res, next) => {
@@ -127,25 +128,55 @@ app.post('/create-admin', ensureAuthenticated, (req, res) => {
 });
 
 
-app.post('/change-pass', ensureAuthenticated, (req, res) => {
+app.post('/updated-account', ensureAuthenticated, (req, res) => {
     const userId = req.user.id
-    const {prevPass, newPass} = req.body;
+    const {
+        currentUsername,
+        username,
+        firstname,
+        lastname,
+        currentPass,
+        newPass,
+        confirmPass
+    } = req.body;
+
+    if ((!username || username.length < 2) ||
+        (newPass && newPass.length < 8) ||
+        (newPass !== confirmPass) ||
+        (!currentPass)) {
+        res.json({error: 'Failed to save. Missing inputs.'})
+        res.end()
+        return;
+    }
+
+    let savePass = currentPass;
+    if (newPass) savePass = newPass;
 
     // Check if user exists
     query('SELECT * FROM users WHERE id=$1', [userId])
         .then(rows => {
             const {pass} = rows[0]
 
-            bcrypt.compare(prevPass, pass)
+            bcrypt.compare(currentPass, pass)
                 .then(isMatch => {
-                    if (!isMatch) return res.json({error: 'Incorrect Password'});
-                    hashPass(newPass)
+                    if (!isMatch) {
+                        res.json({error: 'Incorrect Password'});
+                        res.end();
+                        return;
+                    }
+
+                    hashPass(savePass)
                         .then(hashedPass =>
-                            query('UPDATE users SET pass=$1 WHERE id=$2',
-                                [hashedPass, userId])
+                            query(`UPDATE users
+                                   SET pass=$1,
+                                       username=$2,
+                                       firstname=$3,
+                                       lastname=$4
+                                   WHERE id = $5`,
+                                [hashedPass, username, firstname, lastname, userId])
                         )
                         .then(_ => {
-                            res.status(200).json({success: true})
+                            res.status(200).json({error: false})
                             res.end()
                         })
                         .catch(err => console.log(err))
@@ -154,7 +185,10 @@ app.post('/change-pass', ensureAuthenticated, (req, res) => {
 
 
         })
-        .catch(err => console.error(err))
+        .catch(err => {
+            console.error(err);
+            res.status(500).end()
+        })
 });
 
 app.get('/logout', (req, res) => {
@@ -163,7 +197,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.post('/payment-success', (req, res) => {
-    const {id, created} = req.body;
+    const {id, created, eventData, userData} = req.body;
 
     query(`UPDATE transactions
            SET purchased_on=to_timestamp($1),
@@ -171,9 +205,46 @@ app.post('/payment-success', (req, res) => {
            WHERE transaction_id = $2`, [created, id])
         .then(_ => query('SELECT * FROM transactions WHERE transaction_id=$1', [id]))
         .then(rows => {
-            console.log('UPDATED', rows);
+            const ticketId = rows[0].ticket_id
 
-            res.status(200).json({ticket: rows[0].ticket_id})
+            console.log({
+                ticketId,
+                email: userData.email,
+                firstname: userData.firstname,
+                lastname: userData.lastname,
+                product: userData.product,
+                qty: userData.qty,
+                price: userData.price,
+                tipAmount: Number(userData.tipAmount),
+                total: userData.total,
+                date_time: eventData.date_time,
+                venue: eventData.venue
+            })
+
+            sendEmail({
+                ticketId,
+                email: userData.email,
+                firstname: userData.firstname,
+                lastname: userData.lastname,
+                product: userData.product,
+                qty: userData.qty,
+                price: userData.price,
+                tipAmount: Number(userData.tipAmount),
+                total: userData.total,
+                date_time: eventData.date_time,
+                venue: eventData.venue,
+                title: eventData.title
+            })
+                .then(({accepted}) => {
+                    if (!accepted) return;
+                    return query(
+                        `UPDATE transactions
+                         SET email_sent= TRUE
+                         WHERE transaction_id = $2`, [id])
+                })
+                .catch(console.error)
+
+            res.status(200).json({ticket: ticketId})
             res.end();
         })
         .catch(err => console.log(err))
@@ -182,8 +253,7 @@ app.post('/payment-success', (req, res) => {
 app.post("/create-payment-intent", (req, res) => {
 
     const {price, qty, email, firstname, lastname, tipAmount} = req.body;
-    console.log(req.body)
-    //TODO: VALIDATE
+    const total = (qty * price) + tipAmount
 
     query('SELECT * FROM product')
         .then(rows => {
@@ -194,8 +264,6 @@ app.post("/create-payment-intent", (req, res) => {
                 res.end();
                 return;
             }
-
-            const total = (qty * price) + tipAmount
 
             return stripe.paymentIntents.create({
                 amount: total * 100,
@@ -209,18 +277,33 @@ app.post("/create-payment-intent", (req, res) => {
 
             const ticketId = `${firstname}_${lastname}_${paymentIntent.id.split('_')[1]}`
 
-            //TODO: Generate Ticket number
-            query(`INSERT INTO transactions(firstname, lastname, price, ticket_id, email, transaction_id)
-                   VALUES ($1, $2, $3, $4, $5, $6)`, [firstname, lastname, price, ticketId, email, paymentIntent.id])
+            query(`INSERT INTO transactions(firstname, lastname, price, ticket_id, email, transaction_id, qty,
+                                            total_paid, tip)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+                [firstname, lastname, price, ticketId, email, paymentIntent.id, qty, total, tipAmount])
                 .then(userSaved => console.log(userSaved))
-                .catch(err => console.log(err))
+                .catch(console.error)
 
             res.json({
                 clientSecret: paymentIntent.client_secret
             });
         })
-        .catch(err => console.log(err))
+        .catch(console.error)
 
 });
+
+app.get('/transactions', ensureAuthenticated, (req, res) => {
+    query('SELECT * FROM transactions')
+        .then(rows => {
+            res.status(200).json(rows)
+            res.end()
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500);
+            res.end()
+        })
+});
+
 
 app.listen(5000, () => console.log('Running on http://localhost:5000'));
