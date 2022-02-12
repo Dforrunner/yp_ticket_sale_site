@@ -12,10 +12,16 @@ const {configPassport, ensureAuthenticated} = require('./auth');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('./email');
 const format = require('pg-format');
+const path = require("express-session");
 
 app.use(express.static("public/build"));
 app.use(express.static("public"));
 configPassport(passport);
+
+// Send index.html and let React handle routes
+app.use((req, res) => {
+    res.sendFile(path.resolve(__dirname, "./public/build/index.html"))
+});
 
 app.use((req, res, next) => {
     console.log(`[${moment().format("MMM DD, YYYY Thh:mm:ss")}]: ${req.method} | ${req.originalUrl} `);
