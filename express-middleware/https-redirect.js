@@ -13,13 +13,13 @@ const isSecure = (req) => {
 }
 
 module.exports = (req, res, next) => {
-        if (req.hostname === 'localhost') return next();
+    if (req.hostname === 'localhost') return next();
 
-        if (isSecure(req)) return next();
+    if (isSecure(req)) return next();
 
-        // Note that we do not keep the port as we are using req.hostname
-        // and not req.headers.host. The port number does not really have
-        // a meaning in most cloud deployments since they port forward.
-        res.redirect('https://' + req.hostname + req.originalUrl);
-    };
+    // Note that we do not keep the port as we are using req.hostname
+    // and not req.headers.host. The port number does not really have
+    // a meaning in most cloud deployments since they port forward.
+    res.redirect('https://' + req.hostname + req.originalUrl);
+};
 

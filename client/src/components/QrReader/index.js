@@ -12,6 +12,18 @@ let workerBlob = createBlob(['./worker.js'], {
 // Props that are allowed to change dynamicly
 const propsKeys = ['delay', 'legacyMode', 'facingMode']
 
+const mirrorImage = (ctx, image, x = 0, y = 0, horizontal = false, vertical = false) =>{
+  ctx.save();  // save the current canvas state
+  ctx.setTransform(
+      horizontal ? -1 : 1, 0, // set the direction of x axis
+      0, vertical ? -1 : 1,   // set the direction of y axis
+      x + (horizontal ? image.width : 0), // set the x origin
+      y + (vertical ? image.height : 0)   // set the y origin
+  );
+  ctx.drawImage(image,0,0);
+  ctx.restore(); // restore the state as it was when this function was called
+}
+
 export default class QrReader extends Component {
   static defaultProps = {
     delay: 500,
@@ -237,9 +249,8 @@ export default class QrReader extends Component {
 
     if (legacyMode || previewIsPlaying) {
       const ctx = canvas.getContext('2d')
-
       ctx.drawImage(legacyMode ? img : preview, hozOffset, vertOffset, width, height)
-
+      //mirrorImage(ctx, legacyMode ? img : preview, hozOffset, vertOffset, true, false)
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
       // Send data to web-worker
       this.worker.postMessage(imageData)
@@ -300,7 +311,9 @@ export default class QrReader extends Component {
       overflow: 'hidden',
       position: 'relative',
       width: '100%',
+      height: '100%',
       paddingTop: '100%',
+      transform: 'scaleX(-1)'
     }
     const hiddenStyle = { display: 'none' }
     const previewStyle = {
@@ -311,27 +324,29 @@ export default class QrReader extends Component {
       overflow: 'hidden',
       width: '100%',
       height: '100%',
+      transform: 'scaleX(-1)'
     }
     const videoPreviewStyle = {
       ...previewStyle,
       objectFit: 'cover',
-      transform: this.state.mirrorVideo ? 'scaleX(-1)' : undefined,
+      transform: 'scaleX(-1)'
     }
     const imgPreviewStyle = {
       ...previewStyle,
       objectFit: 'scale-down',
+      transform: 'scaleX(-1)'
     }
 
     const viewFinderStyle = {
-      top: 0,
+      top: 140,
       left: 0,
       zIndex: 1,
       boxSizing: 'border-box',
-      border: '50px solid rgba(0, 0, 0, 0.3)',
-      boxShadow: 'inset 0 0 0 5px rgba(255, 0, 0, 0.5)',
+      border: '50px solid rgba(0, 0, 0, 0.5)',
+      boxShadow: 'inset 0 0 0 20px rgba(255, 255, 255, 0.1)',
       position: 'absolute',
       width: '100%',
-      height: '100%',
+      height: '60%',
     }
 
     return (

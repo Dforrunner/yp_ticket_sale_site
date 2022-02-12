@@ -160,7 +160,7 @@ const CheckinTab = ({index, prevTab, setTab, scanData = [], setScanData}) => {
             .then(res => {
                 setIsLoading(false);
 
-                if(res.error)
+                if (res.error)
                     return setMsg(res.error)
 
                 setMsg('Checked in selected customers')
@@ -247,7 +247,7 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
     const [msg, setMsg] = useState('');
 
     const getTransaction = (ticketId) => {
-        if(!ticketId || ticketId.split('_')[0] !== 'ypstl'){
+        if (!ticketId || ticketId.split('_')[0] !== 'ypstl') {
             setMsg('Invalid Code')
             return;
         }
@@ -273,7 +273,7 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
                 }];
 
                 if (res.additionalTickets.length)
-                    res.additionalTickets.map(i => users.push({mainBuyer: false,  ...i}))
+                    res.additionalTickets.map(i => users.push({mainBuyer: false, ...i}))
 
                 setScanData(users)
                 setTab(4)
@@ -283,7 +283,8 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
 
     const handleScan = (value) => {
         setMsg(value)
-        if(Array.isArray(value)) value = value[0];
+        console.log('VAL', value);
+        if (Array.isArray(value)) value = value[0];
         getTransaction(value)
     }
 
@@ -293,32 +294,20 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
 
     return (
         <div className={`${slideAnimation(index, prevTab)} w-full md:mt-10 h-screen`}>
-            <div className='flex justify-center items-center mt-5 h-[75%]'>
+            <div className='flex justify-center items-center h-[84%] relative'>
                 {index === activeTab && <QrReader
                     delay={100}
                     style={{
-                        height: window.screen.height - 250,
-                        width: window.screen.width,
+                        height: "100%",
+                        width: "100%",
                     }}
                     onError={handleError}
                     onScan={handleScan}
                 />}
             </div>
 
-            <div className='fixed bottom-20  w-full'>
-                <div className='flex justify-center items-center h-[40px]'>
-                    <p className='text-gray-400'>{msg}</p>
-                </div>
-
-                <div className='flex justify-center items-center bg-[#3071BB]
-                                hover:bg-[#3584DF] h-[50px] text-white m-5 rounded w-[90%]'>
-                    {isLoading
-                        ? <Loader/>
-                        : <button className='w-full h-full cursor-pointer' onClick={() => {}}>
-                            SCAN QR CODE
-                        </button>
-                    }
-                </div>
+            <div className='flex justify-center items-center w-full fixed bottom-20  h-[40px]'>
+                <p className='text-gray-300'>{msg}</p>
             </div>
         </div>
     )
