@@ -407,4 +407,5 @@ app.post('/check-in', ensureAuthenticated, (req, res) => {
         })
 });
 
-app.listen(5000, () => console.log('Running on http://localhost:5000'));
+app.listen(process.env.PORT, () =>
+    console.log(`Running on http://localhost:${process.env.PORT}`));
