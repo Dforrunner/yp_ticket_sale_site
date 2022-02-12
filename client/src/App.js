@@ -1,7 +1,6 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import { PosterPage, PurchasePage, LoginPg, Dashboard} from "./components";
 import {RequireAuth} from "./components/Auth";
-import QrReader from "./components/QrReader";
 
 const App = () => {
     return (
@@ -16,7 +15,6 @@ const App = () => {
                             <Dashboard />
                         </RequireAuth>}
                     />
-                    <Route path='/qr-reader' exact element={<QrReader />}/>
                 </Routes>
             </BrowserRouter>
         </div>

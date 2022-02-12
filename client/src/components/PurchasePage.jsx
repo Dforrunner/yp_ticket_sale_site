@@ -9,6 +9,7 @@ import Loader from "./Loader";
 import QRCode from 'qrcode.react';
 import {useReactToPrint} from "react-to-print";
 import InputField from "./InputField";
+
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
 
 const TipBtn = ({amount, setTip}) =>
@@ -44,6 +45,12 @@ const Checkout = ({
 
         if (isLoading) return;
 
+        const extraTicketUsers = [];
+
+        e.target.querySelectorAll('[name="additionalTickets[]"]').forEach(i => {
+            extraTicketUsers.push(i.value)
+        })
+
         const getVal = (name) => e.target[name].value;
 
         const formData = {
@@ -54,10 +61,11 @@ const Checkout = ({
             email: getVal('email'),
             emailConfirm: getVal('emailConfirm'),
             tipAmount: Number(getVal('tipAmount')),
-            additionalTickets: orderQty > 1 && getVal('additionalTickets'),
+            additionalTickets: extraTicketUsers,
             total: (orderQty * price) + Number(tip ? tip : 0),
             price
         }
+
 
         if (formData.email !== formData.emailConfirm)
             return setEmailErr(true);
@@ -240,10 +248,8 @@ const Checkout = ({
 const Payment = ({clientSecret, ...rest}) => {
     return (
         <div className='flex justify-center mt-10'>
-            <div className='md:w-[90%]'>
+            <div className='md:w-[90%] min-h-[300px]'>
                 <h2 className='text-2xl mb-6'>Payment Information</h2>
-
-                {clientSecret &&
                 <Elements
                     options={{
                         clientSecret,
@@ -255,7 +261,6 @@ const Payment = ({clientSecret, ...rest}) => {
                 >
                     <CheckoutForm clientSecret={clientSecret} {...rest}/>
                 </Elements>
-                }
             </div>
         </div>
     )
@@ -488,7 +493,7 @@ const PurchasePage = () => {
 
     const handleChangeIndex = (index) => {
         if (index > highestCompletedTab) setHighestCompletedTab(index);
-        window.scrollTo({top: 0, behavior: 'smooth'})
+        window.scrollTo({top: 0, behavior: 'smooth'});
         setTabIndex(index);
     }
 
@@ -506,6 +511,7 @@ const PurchasePage = () => {
                 const cS = data.clientSecret;
                 setClientSecret(cS);
                 setIsLoading(false);
+                handleChangeIndex(1);
             });
     }
 
@@ -540,7 +546,6 @@ const PurchasePage = () => {
                             <Checkout
                                 index={0}
                                 activeStep={tabIndex}
-                                handleChangeIndex={handleChangeIndex}
                                 handleCheckout={handleCheckout}
                                 isLoading={isLoading}
                                 setIsLoading={setIsLoading}
@@ -562,6 +567,7 @@ const PurchasePage = () => {
                                     setPaymentBtnText={setPaymentBtnText}
                                     setCompleted={setCompleted}
                                     setIsLoading={setIsLoading}
+                                    completed={completed}
                                 />
                                 : <div className='p-5 text-center'><h2> Please place order first.</h2></div>
                             }
@@ -606,11 +612,12 @@ const PurchasePage = () => {
                             isLoading={isLoading}
                             targetFormId='payment-form'
                             text={paymentBtnText}
-                            disabled={isLoading || completed}
+                            disabled={isLoading}
+                            onClick={() => completed && handleChangeIndex(2)}
                         />}
 
-                        {(tabIndex ===2 && completed) &&
-                            <PrintTicketBtn handlePrint={handlePrint}/>
+                        {(tabIndex === 2 && completed) &&
+                        <PrintTicketBtn handlePrint={handlePrint}/>
                         }
 
                     </OrderSummary>

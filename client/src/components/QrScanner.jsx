@@ -22,13 +22,13 @@ const QRScan = ({onFind}) => {
         const canvasWidth = window.screen.width * ratio;
         const canvasHeight = window.screen.height * ratio;
 
+        console.log({canvasWidth, canvasHeight})
         canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
+        canvas.height = canvasHeight - 150;
 
         const context = canvas.getContext('2d');
 
         if (navigator.mediaDevices.getUserMedia) {
-            console.log({video})
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     video.srcObject = stream
@@ -38,11 +38,6 @@ const QRScan = ({onFind}) => {
                 })
                 .catch(err => console.log(err));
         }
-
-        // navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}})
-        //     .then((stream) => {
-        //
-        // })
 
         const tick = () => {
             if (notEnabled) setNotEnabled(false);

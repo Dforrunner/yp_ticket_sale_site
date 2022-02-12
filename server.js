@@ -11,7 +11,10 @@ const moment = require('moment');
 const {configPassport, ensureAuthenticated} = require('./auth');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('./email');
+const format = require('pg-format');
+const path = require("path");
 
+app.use(express.static(path.join(__dirname, "client/build")));
 app.use(express.static("public"));
 configPassport(passport);
 
@@ -44,6 +47,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+/**
+ * Queries and returns all details from the details DB table
+ */
 app.get('/details', (req, res) => {
     query(`
         SELECT *, CAST((product.qty - (SELECT COUNT(*) FROM transactions)) AS int) AS available_qty
@@ -56,6 +62,9 @@ app.get('/details', (req, res) => {
         .catch(err => console.log(err))
 })
 
+/**
+ * Updated details DB table
+ */
 app.post('/details', (req, res) => {
     query('UPDATE details VALUES ? WHERE id=1', [res.body])
         .then(rows => {
@@ -65,6 +74,9 @@ app.post('/details', (req, res) => {
         .catch(err => console.log(err))
 })
 
+/**
+ * Endpoint used to confirm the user is still logged in
+ */
 app.get('/admin', (req, res) => {
     if (req.isAuthenticated())
         res.status(200).json({
@@ -78,9 +90,11 @@ app.get('/admin', (req, res) => {
         });
 });
 
+/**
+ * Admin panel login endpoint
+ */
 app.post('/admin', (req, res) => {
     passport.authenticate('local', {}, (error, user) => {
-        console.log({error, user})
         if (error) {
             res.json({isAuthenticated: false, ...error, user: user})
             res.end()
@@ -94,12 +108,20 @@ app.post('/admin', (req, res) => {
     })(req, res);
 });
 
+/**
+ * Salt and hash password string using bcrypt
+ * @param pass
+ * @return hash
+ */
 const hashPass = (pass) =>
     bcrypt.genSalt(10)
         .then(salt => bcrypt.hash(pass, salt))
         .catch(err => console.log(err))
 
 
+/**
+ * Create new admin and store them into the DB
+ */
 app.post('/create-admin', ensureAuthenticated, (req, res) => {
     const {username, password, firstname, lastname} = req.body;
 
@@ -127,7 +149,9 @@ app.post('/create-admin', ensureAuthenticated, (req, res) => {
         .catch(err => console.error(err))
 });
 
-
+/**
+ * Update admin account endpoint
+ */
 app.post('/updated-account', ensureAuthenticated, (req, res) => {
     const userId = req.user.id
     const {
@@ -191,11 +215,19 @@ app.post('/updated-account', ensureAuthenticated, (req, res) => {
         })
 });
 
+/**
+ * Auth logout endpoint
+ */
 app.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/admin');
 });
 
+/**
+ * Handle successful payment
+ * - Update transaction table to confirm payment has been made
+ * - Email the user their ticket
+ */
 app.post('/payment-success', (req, res) => {
     const {id, created, eventData, userData} = req.body;
 
@@ -206,20 +238,6 @@ app.post('/payment-success', (req, res) => {
         .then(_ => query('SELECT * FROM transactions WHERE transaction_id=$1', [id]))
         .then(rows => {
             const ticketId = rows[0].ticket_id
-
-            console.log({
-                ticketId,
-                email: userData.email,
-                firstname: userData.firstname,
-                lastname: userData.lastname,
-                product: userData.product,
-                qty: userData.qty,
-                price: userData.price,
-                tipAmount: Number(userData.tipAmount),
-                total: userData.total,
-                date_time: eventData.date_time,
-                venue: eventData.venue
-            })
 
             sendEmail({
                 ticketId,
@@ -240,7 +258,7 @@ app.post('/payment-success', (req, res) => {
                     return query(
                         `UPDATE transactions
                          SET email_sent= TRUE
-                         WHERE transaction_id = $2`, [id])
+                         WHERE transaction_id = $1`, [id])
                 })
                 .catch(console.error)
 
@@ -250,10 +268,18 @@ app.post('/payment-success', (req, res) => {
         .catch(err => console.log(err))
 })
 
+/**
+ * - Confirm order
+ * - Create new transaction and save to transactions DB table
+ * - If there are extra tickets purchase saved those in the extra_ticket table
+ * - Create a Stripe payment intent
+ * - Return the Stripe payment intent to to the front end. That is used to complete the payment there
+ */
 app.post("/create-payment-intent", (req, res) => {
 
-    const {price, qty, email, firstname, lastname, tipAmount} = req.body;
+    const {price, qty, email, firstname, lastname, tipAmount, additionalTickets} = req.body;
     const total = (qty * price) + tipAmount
+    let payIntent;
 
     query('SELECT * FROM product')
         .then(rows => {
@@ -274,24 +300,71 @@ app.post("/create-payment-intent", (req, res) => {
             });
         })
         .then(paymentIntent => {
+            payIntent = paymentIntent
+            const ticketCount = qty + additionalTickets.length;
+            const ticketId = `ypstl_${firstname}_${lastname}_${paymentIntent.id.split('_')[1]}_${ticketCount}`
 
-            const ticketId = `${firstname}_${lastname}_${paymentIntent.id.split('_')[1]}`
-
-            query(`INSERT INTO transactions(firstname, lastname, price, ticket_id, email, transaction_id, qty,
-                                            total_paid, tip)
-                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+            return query(`INSERT INTO transactions(firstname, lastname, price, ticket_id, email, transaction_id, qty,
+                                                   total_paid, tip)
+                          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                          RETURNING id`,
                 [firstname, lastname, price, ticketId, email, paymentIntent.id, qty, total, tipAmount])
-                .then(userSaved => console.log(userSaved))
-                .catch(console.error)
 
+        })
+        .then(rows => insertId = rows[0].id)
+        .then(id => {
+            if (!additionalTickets.length) return;
+
+            const rows = []
+            additionalTickets.map(i => rows.push([i, id]))
+            const sql = format('INSERT INTO extra_tickets (full_name, buyer_id) VALUES %L', rows);
+
+            return query(sql, [])
+        })
+        .then(() => {
             res.json({
-                clientSecret: paymentIntent.client_secret
+                clientSecret: payIntent.client_secret
             });
         })
         .catch(console.error)
-
 });
 
+/**
+ * Get ticket information for ticket_id
+ * Used to get scanned QR data
+ */
+app.post('/transaction', ensureAuthenticated, (req, res) => {
+    const {ticketId} = req.body;
+
+    query('SELECT * FROM transactions WHERE ticket_id=$1', [ticketId])
+        .then(rows => {
+            if(!rows.length)
+                return res.json({error: 'User not found'}).end();
+
+            const ticketData = rows[0];
+
+            if (ticketData.qty === 1) {
+                res.status(200).json(ticketData);
+                res.end();
+                return;
+            }
+
+            return query('SELECT * FROM extra_tickets WHERE buyer_id=$1', [ticketData.id])
+                .then(exRows => {
+                    ticketData.additionalTickets = exRows;
+                    res.status(200).json(ticketData);
+                    res.end();
+                })
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).end()
+        })
+});
+
+/**
+ * Get all transactions from the transactions DB table
+ */
 app.get('/transactions', ensureAuthenticated, (req, res) => {
     query('SELECT * FROM transactions')
         .then(rows => {
@@ -305,5 +378,34 @@ app.get('/transactions', ensureAuthenticated, (req, res) => {
         })
 });
 
+
+/**
+ * Check-in users - Update DB
+ */
+app.post('/check-in', ensureAuthenticated, (req, res) => {
+    const data = req.body;
+    const adminId = req.user.id;
+
+    const queries = [];
+
+    data.map(({mainBuyer, id}) => {
+        const sql = !mainBuyer
+            ? 'UPDATE extra_tickets SET checked_in=true, checked_in_on=now(), checked_in_by=$1 WHERE id=$2 RETURNING id'
+            : 'UPDATE transactions SET checked_in=true, checked_in_on=now(), checked_in_by=$1 WHERE id=$2 RETURNING id'
+
+        queries.push(query(sql, [adminId, id]))
+    })
+
+    Promise.all(queries)
+        .then(rows => {
+            const updatedIds = [];
+            rows.map(i => updatedIds.push(i[0].id))
+            res.status(200).json({updatedIds})
+        })
+        .catch(err => {
+            console.log(err)
+            res.json({error: 'Failed to update database'}).end();
+        })
+});
 
 app.listen(5000, () => console.log('Running on http://localhost:5000'));

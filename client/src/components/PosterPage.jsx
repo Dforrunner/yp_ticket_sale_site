@@ -12,7 +12,6 @@ const PosterPage = () => {
         fetch('/details')
             .then(res => res.json())
             .then(details => {
-                console.log(details);
                 setDetails(details);
 
                 if (details.available_qty <= 0)

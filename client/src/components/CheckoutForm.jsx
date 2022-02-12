@@ -14,7 +14,8 @@ const CheckoutForm = ({
                           setMessage,
                           setIsLoading,
                           setPaymentBtnText,
-                          setCompleted
+                          setCompleted,
+                          completed
                       }) => {
     const stripe = useStripe();
     const elements = useElements();
@@ -28,6 +29,7 @@ const CheckoutForm = ({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if(completed) return handleChangeIndex(2);
         if (!stripe || !elements) return;
 
 

@@ -23,6 +23,7 @@
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
     "pg": "^8.7.3",
+    "pg-format": "^1.0.4",
     "qrcode": "^1.5.0",
     "stripe": "^8.201.0",
     "uuid": "^8.3.2"

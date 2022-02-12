@@ -51,7 +51,7 @@ const sendEmail = ({
 
             return transporter.sendMail({
                 from: '"Young Professionals of St. Louis 👩🏿‍💼🧑🏻‍💼👩🏽‍💼🧑🏼‍💼" <info@ypstl.com>', // sender address
-                to: `${email}`,
+                to: `${email}, info@ypstl.com`,
                 subject: `✨5K Ball✨ Ticket 💃🕺 - ${firstname} ${lastname}`, // Subject line
                 html: emailTemplate({
                     ticketId,
@@ -76,21 +76,21 @@ const sendEmail = ({
 module.exports = sendEmail;
 
 
-sendEmail({
-    title: 'Young Professionals of Saint Louis 5K Ball',
-    ticketId: 'testIDsdfdsf4334',
-    firstname: 'Muhammet',
-    lastname: 'Barut',
-    product: 'Young Professionals of Saint Louis 5K Ball - ticket',
-    qty: 1,
-    price: 40,
-    tipAmount: 10,
-    total: 40,
-    date_time: 'FRI 04.01.22 | 9PM - MIDNIGHT',
-    venue: 'Piper Palm House - Tower Grove Park',
-    email: 'vtme-996@hotmail.com'
-})
-    .then(info => {
-        console.log("Message sent: %s", info);
-    })
+// sendEmail({
+//     title: 'Young Professionals of Saint Louis 5K Ball',
+//     ticketId: 'testIDsdfdsf4334',
+//     firstname: 'Muhammet',
+//     lastname: 'Barut',
+//     product: 'Young Professionals of Saint Louis 5K Ball - ticket',
+//     qty: 1,
+//     price: 40,
+//     tipAmount: 10,
+//     total: 40,
+//     date_time: 'FRI 04.01.22 | 9PM - MIDNIGHT',
+//     venue: 'Piper Palm House - Tower Grove Park',
+//     email: 'vtme-996@hotmail.com'
+// })
+//     .then(info => {
+//         console.log("Message sent: %s", info);
+//     })
 

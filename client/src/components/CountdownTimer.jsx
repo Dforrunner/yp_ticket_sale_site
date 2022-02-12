@@ -11,7 +11,7 @@ const CountdownTimer = ({expireDate, className}) => {
 
     useEffect(() => {
 
-        if (!expireDate) return console.log('Waiting for exp date');
+        if (!expireDate) return;
         const expDate = new Date(expireDate).getTime();
 
         // Update the count down every 1 second

@@ -13,15 +13,15 @@ import * as React from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import List from "@mui/material/List";
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import {AuthContext} from "./Auth";
 import {useNavigate} from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import {TextField} from "@mui/material";
+import {Checkbox, FormControlLabel, FormGroup, TextField} from "@mui/material";
 import Loader from "./Loader";
 import {DataGrid} from '@mui/x-data-grid';
+import QrReader from './QrReader'
 
 const Navbar = ({tab, setTab, setPrevTab}) => {
 
@@ -83,7 +83,7 @@ const DashTab = ({index, activeTab}) => {
         {field: 'qty', headerName: 'QTY', type: 'number', width: 60},
         {field: 'price', headerName: '@Price', type: 'number', width: 80},
         {field: 'tip', headerName: 'Donation', type: 'number', width: 90},
-        {field: 'total_paid', headerName: 'Total Paid', type: 'number', width:90},
+        {field: 'total_paid', headerName: 'Total Paid', type: 'number', width: 90},
         {field: 'email', headerName: 'Email', width: 200},
         {field: 'checked_in', headerName: 'Checked In'},
         {field: 'checked_in_by', headerName: 'By'},
@@ -123,9 +123,203 @@ const DashTab = ({index, activeTab}) => {
     )
 }
 
-const ScanTab = ({index, prevTab}) => {
+
+const CheckinTab = ({index, prevTab, setTab, scanData = [], setScanData}) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectAll, setSelectAll] = useState(false);
+    const [msg, setMsg] = useState('');
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const checkedUsers = [];
+
+        e.target.querySelectorAll('[name="user[]"]').forEach(i => {
+            if (i.checked) checkedUsers.push(Number(i.value))
+        })
+
+        const usersToCheckIn = [];
+
+        scanData.map(i => {
+            if (checkedUsers.includes(i.id) && !i.checked_in)
+                usersToCheckIn.push(i)
+        })
+
+        if (!usersToCheckIn.length)
+            return setMsg('Select a new customer to check-in');
+        setMsg('');
+
+
+        setIsLoading(true);
+        fetch('/check-in', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(usersToCheckIn)
+        })
+            .then(res => res.json())
+            .then(res => {
+                setIsLoading(false);
+
+                if(res.error)
+                    return setMsg(res.error)
+
+                setMsg('Checked in selected customers')
+
+                const updatedData = []
+
+                scanData.map(i => {
+                    if (checkedUsers.includes(i.id))
+                        updatedData.push({...i, checked_in: true})
+                    else
+                        updatedData.push(i)
+                })
+
+                console.log({updatedData})
+                setScanData(updatedData);
+
+                const timer = setTimeout(() => {
+                    setMsg('')
+                    clearTimeout(timer)
+                }, 4000)
+            })
+            .catch(console.error)
+    }
+
     return (
-        <div className={`${slideAnimation(index, prevTab)}  w-full`}>Scanner</div>
+        <div className={`${slideAnimation(index, prevTab)}  w-full`}>
+            <div
+                className='flex items-center p-3 bg-[#121212] md:bg-[#595959] md:mt-4 h-[50px] cursor-pointer'
+                onClick={() => setTab(1)}>
+                <ArrowBackIcon/>
+                Back
+            </div>
+
+            <h1 className='text-2xl text-center my-10'>Check In Customer</h1>
+            <form onSubmit={handleSubmit}>
+                <FormGroup
+                    sx={{
+                        '& .MuiSvgIcon-root': {fontSize: 45}
+                    }}
+                >
+
+                    <div className='ml-10 pb-[300px]'>
+                        {scanData.length > 1
+                            ? scanData.map((user, index) =>
+                                <FormControlLabel
+                                    key={`${user.full_name}_${user.id}_${index}`}
+                                    control={<Checkbox
+                                        name='user[]'
+                                        value={user.id}
+                                        defaultChecked={user.checked_in}
+                                        disabled={user.checked_in}
+                                    />}
+                                    label={`${user.full_name} ${user.mainBuyer ? ' - Buyer' : ''}`}/>
+                            )
+                            : <h1 className='text-2xl text-center p-10 -ml-10'>Sing leUser</h1>
+                        }
+                    </div>
+                </FormGroup>
+
+
+                <div className='sticky bottom-0 mb-10'>
+                    <div className='flex justify-center items-center h-[40px] '>
+                        <p className='text-gray-400'>{msg}</p>
+                    </div>
+
+                    <div className='flex justify-center items-center bg-[#3071BB]
+                                hover:bg-[#3584DF] h-[50px] text-white mx-5 rounded w-[90%]'>
+                        {isLoading
+                            ? <Loader/>
+                            : <button className='w-full h-full cursor-pointer' type='submit'>
+                                CHECK IN
+                            </button>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    )
+}
+
+
+const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [msg, setMsg] = useState('');
+
+    const getTransaction = (ticketId) => {
+        if(!ticketId || ticketId.split('_')[0] !== 'ypstl'){
+            setMsg('Invalid Code')
+            return;
+        }
+        setMsg('')
+        setIsLoading(true);
+        fetch('/transaction', {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ticketId})
+        })
+            .then(res => res.json())
+            .then(res => {
+                setIsLoading(false);
+
+                if (res.error)
+                    return setMsg(res.error);
+
+                const users = [{
+                    id: res.id,
+                    full_name: `${res.firstname} ${res.lastname}`,
+                    checked_in: res.checked_in,
+                    mainBuyer: true
+                }];
+
+                if (res.additionalTickets.length)
+                    res.additionalTickets.map(i => users.push({mainBuyer: false,  ...i}))
+
+                setScanData(users)
+                setTab(4)
+            })
+            .catch(console.error)
+    }
+
+    const handleScan = (value) => {
+        if(Array.isArray(value)) value = value[0];
+        getTransaction(value)
+    }
+
+    const handleError = (err) => {
+        setMsg(err)
+    }
+
+    return (
+        <div className={`${slideAnimation(index, prevTab)} w-full md:mt-10 h-screen`}>
+            <div className='flex justify-center items-center mt-5 h-[75%]'>
+                {index === activeTab && <QrReader
+                    delay={100}
+                    style={{
+                        height: window.screen.height - 250,
+                        width: window.screen.width,
+                    }}
+                    onError={handleError}
+                    onScan={handleScan}
+                />}
+            </div>
+
+            <div className='fixed bottom-20  w-full'>
+                <div className='flex justify-center items-center h-[40px]'>
+                    <p className='text-gray-400'>{msg}</p>
+                </div>
+
+                <div className='flex justify-center items-center bg-[#3071BB]
+                                hover:bg-[#3584DF] h-[50px] text-white m-5 rounded w-[90%]'>
+                    {isLoading
+                        ? <Loader/>
+                        : <button className='w-full h-full cursor-pointer' onClick={() => {}}>
+                            SCAN QR CODE
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
     )
 }
 
@@ -221,7 +415,7 @@ const AccountTab = ({index, prevTab, setTab, user}) => {
         <div className={`${slideAnimation(index, prevTab)}  w-full`}>
             <div
                 className='flex items-center p-3 bg-[#121212] md:bg-[#595959] md:mt-4 h-[50px] cursor-pointer'
-                onClick={() => setTab(index - 1)}
+                onClick={() => setTab(2)}
             >
                 <ArrowBackIcon/>
                 Back
@@ -325,7 +519,8 @@ const SettingsTab = ({index, prevTab, setTab, logout, navigate}) => {
 
 const Dashboard = () => {
     const [tab, setTab] = useState(0);
-    const [prevTab, setPrevTab] = useState(0)
+    const [prevTab, setPrevTab] = useState(0);
+    const [scanData, setScanData] = useState([]);
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -343,7 +538,10 @@ const Dashboard = () => {
                     {tab === 1 &&
                     <ScanTab
                         index={1}
+                        activeTab={tab}
                         prevTab={prevTab}
+                        setTab={setTab}
+                        setScanData={setScanData}
                     />}
 
                     {tab === 2 &&
@@ -361,6 +559,15 @@ const Dashboard = () => {
                         prevTab={prevTab}
                         setTab={setTab}
                         user={auth.user}
+                    />}
+
+                    {tab === 4 &&
+                    <CheckinTab
+                        index={4}
+                        prevTab={prevTab}
+                        setTab={setTab}
+                        scanData={scanData}
+                        setScanData={setScanData}
                     />}
 
                 </div>
