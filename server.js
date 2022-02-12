@@ -12,8 +12,9 @@ const {configPassport, ensureAuthenticated} = require('./auth');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('./email');
 const format = require('pg-format');
+const path = require("path");
 
-
+app.use(express.static(path.join(__dirname, "client/build")));
 app.use(express.static("public"));
 configPassport(passport);
 
