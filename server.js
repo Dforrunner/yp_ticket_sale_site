@@ -18,11 +18,6 @@ app.use(express.static("public/build"));
 app.use(express.static("public"));
 configPassport(passport);
 
-// Send index.html and let React handle routes
-app.use((req, res) => {
-    res.sendFile(path.resolve(__dirname, "./public/build/index.html"))
-});
-
 app.use((req, res, next) => {
     console.log(`[${moment().format("MMM DD, YYYY Thh:mm:ss")}]: ${req.method} | ${req.originalUrl} `);
     next();
@@ -411,6 +406,11 @@ app.post('/check-in', ensureAuthenticated, (req, res) => {
             console.log(err)
             res.json({error: 'Failed to update database'}).end();
         })
+});
+
+// Send index.html and let React handle routes
+app.use((req, res) => {
+    res.sendFile(path.resolve(__dirname, "./public/build/index.html"))
 });
 
 app.listen(process.env.PORT, () =>
