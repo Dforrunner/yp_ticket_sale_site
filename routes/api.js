@@ -2,6 +2,7 @@ const app = require('express').Router();
 const bcrypt = require('bcryptjs');
 const sendEmail = require('../email');
 const format = require('pg-format');
+const passport = require("passport");
 const stripe = require("stripe")(process.env.NODE_STRIPE_SK);
 const {query} = require('../db');
 const {ensureAuthenticated} = require('../auth');
