@@ -501,7 +501,7 @@ const PurchasePage = () => {
     const handleCheckout = (orderDetails) => {
         setOrderFormData(orderDetails)
         // Create PaymentIntent as soon as the page loads
-        fetch("/create-payment-intent", {
+        fetch("/api/create-payment-intent", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(orderDetails),
@@ -516,7 +516,7 @@ const PurchasePage = () => {
     }
 
     const handlePaymentSuccess = (data) =>
-        fetch('/payment-success', {
+        fetch('/api/payment-success', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({...data, userData: orderFormData, eventData: productData}),

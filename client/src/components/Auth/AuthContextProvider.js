@@ -13,7 +13,7 @@ function AuthContextProvider({children}) {
     const [auth, setAuth] = useLocalStorage('yp_user', defaultState);
 
     const loginReq = () => {
-        fetch('/admin')
+        fetch('/api/admin')
             .then(res => res.json())
             .then(res => {
                 setAuth(res)
@@ -33,7 +33,7 @@ function AuthContextProvider({children}) {
 
 
     const login = (username, password) =>
-        fetch('/admin', {
+        fetch('/api/admin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ function AuthContextProvider({children}) {
             .catch(err => console.error(err))
 
     const logout = () =>
-        fetch('/logout')
+        fetch('/api/logout')
             .then(_ => {
                 setAuth(defaultState);
             })

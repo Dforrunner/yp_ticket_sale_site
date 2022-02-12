@@ -90,7 +90,7 @@ const DashTab = ({index, activeTab}) => {
     ];
 
     useEffect(() => {
-        fetch('/transactions')
+        fetch('/api/transactions')
             .then(res => res.json())
             .then(data => {
                 setData(data)
@@ -151,7 +151,7 @@ const CheckinTab = ({index, prevTab, setTab, scanData = [], setScanData}) => {
 
 
         setIsLoading(true);
-        fetch('/check-in', {
+        fetch('/api/check-in', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(usersToCheckIn)
@@ -253,7 +253,7 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
         }
         setMsg('')
         setIsLoading(true);
-        fetch('/transaction', {
+        fetch('/api/transaction', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ticketId})
@@ -389,7 +389,7 @@ const AccountTab = ({index, prevTab, setTab, user}) => {
             }, 5000)
         }
 
-        fetch('/updated-account', {
+        fetch('/api/updated-account', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

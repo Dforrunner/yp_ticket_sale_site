@@ -9,7 +9,7 @@ const PosterPage = () => {
     const [soldOut, setSoldOut] = useState(false)
 
     useEffect(() => {
-        fetch('/details')
+        fetch('/api/details')
             .then(res => res.json())
             .then(details => {
                 setDetails(details);
