@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js -a"
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -27,9 +27,7 @@
     "pg-format": "^1.0.4",
     "qrcode": "^1.5.0",
     "stripe": "^8.201.0",
-    "uuid": "^8.3.2"
-  },
-  "devDependencies": {
+    "uuid": "^8.3.2",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.0"
   },
