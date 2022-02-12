@@ -282,6 +282,7 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
     }
 
     const handleScan = (value) => {
+        setMsg(value)
         if(Array.isArray(value)) value = value[0];
         getTransaction(value)
     }
