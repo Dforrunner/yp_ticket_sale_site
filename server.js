@@ -9,9 +9,9 @@ const {db} = require('./db');
 const moment = require('moment');
 const {configPassport} = require('./auth');
 const path = require("path");
-const httpsRedirect = require('./express-middleware/https-redirect');
-
-app.use('/', httpsRedirect())
+// const httpsRedirect = require('./express-middleware/https-redirect');
+//
+// app.use('/', httpsRedirect())
 
 app.use(express.static("public/build"));
 app.use(express.static("public"));
