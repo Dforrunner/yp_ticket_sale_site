@@ -101,14 +101,14 @@ const DashTab = ({index, activeTab}) => {
                 let transactionFeeSum = 0;
                 let tipSum = 0;
 
-                data.map(i => {
-                    const calTransactionFee = (n) => {
-                        const fee = (n * 0.0299 + 0.30);
-                        transactionFeeSum += fee;
-                        tipSum += i.tip
-                        return n - fee
-                    }
+                const calTransactionFee = (n) => {
+                    const fee = (n * 0.0299 + 0.30);
+                    transactionFeeSum += fee;
+                    return n - fee
+                }
 
+                data.map(i => {
+                    tipSum += i.tip
                     const paid = i.paid_w_venmo ? i.total_paid :  calTransactionFee(i.total_paid)
                     sum += paid
                 })
