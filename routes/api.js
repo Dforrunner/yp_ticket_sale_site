@@ -299,7 +299,7 @@ app.post("/create-payment-intent", (req, res) => {
 app.post('/transaction', ensureAuthenticated, (req, res) => {
     const {ticketId} = req.body;
 
-    query('SELECT * FROM transactions WHERE ticket_id=$1', [ticketId])
+    query('SELECT * FROM transactions WHERE ticket_id=$1 AND purchase_confirmed=TRUE', [ticketId])
         .then(rows => {
             if(!rows.length)
                 return res.json({error: 'User not found'}).end();
@@ -329,7 +329,7 @@ app.post('/transaction', ensureAuthenticated, (req, res) => {
  * Get all transactions from the transactions DB table
  */
 app.get('/transactions', ensureAuthenticated, (req, res) => {
-    query('SELECT * FROM transactions')
+    query('SELECT * FROM transactions WHERE purchase_confirmed=TRUE')
         .then(rows => {
             res.status(200).json(rows)
             res.end()
