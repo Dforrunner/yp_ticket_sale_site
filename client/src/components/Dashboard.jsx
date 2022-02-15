@@ -70,6 +70,7 @@ const DashTab = ({index, activeTab}) => {
     const [data, setData] = useState([]);
     const [total, setTotal] = useState(0);
     const [transactionFee, setTransactionFee] = useState(0);
+    const [totalTips, setTotalTips] = useState(0);
 
     const columns = [
         {field: 'id', headerName: 'ID', width: 70, type: 'number'},
@@ -98,17 +99,21 @@ const DashTab = ({index, activeTab}) => {
                 setData(data)
                 let sum = 0;
                 let transactionFeeSum = 0;
+                let tipSum = 0;
 
                 data.map(i => {
                     const calTransactionFee = (n) => {
                         const fee = (n * 0.0299 + 0.30);
                         transactionFeeSum += fee;
+                        tipSum += i.tip
                         return n - fee
                     }
 
                     const paid = i.paid_venmo ? i.total_paid :  calTransactionFee(i.total_paid)
                     sum += paid
                 })
+
+                setTotalTips(tipSum.toFixed(2));
                 setTransactionFee(transactionFeeSum.toFixed(2));
                 setTotal(sum.toFixed(2))
             })
@@ -120,16 +125,22 @@ const DashTab = ({index, activeTab}) => {
             <div className='flex flex-col p-2'>
                 <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
                     <div className='text-center'>
-                        <p>Total Sales After Fees</p>
+                        <p>Total Sales+Tips After Fees</p>
                         <h1 className='text-4xl text-green-300'>${total}</h1>
                     </div>
-                    <br/>
-                    <div className='text-center'>
-                        <p>Total Fees</p>
-                        <h1 className='text-4xl text-red-300'>${transactionFee}</h1>
+
+                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
+                        <p>Total Fees:</p>
+                        <h1 className='text-3xl text-red-300'>${transactionFee}</h1>
                     </div>
-                    <br/>
-                    <p className='text-center text-sm text-gray-400'>Note: Fees were not taken out for Venmo transactions</p>
+
+                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
+                        <p>Total Donations:</p>
+                        <h1 className='text-3xl text-green-200'>${totalTips}</h1>
+                    </div>
+
+
+                    <p className='text-center text-sm text-gray-400 mt-2'>Note: Fees were not taken out for Venmo transactions to show accurate sales</p>
 
 
                 </div>
