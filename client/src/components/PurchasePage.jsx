@@ -458,7 +458,7 @@ const Ticket = ({ticketVal, activeStep, index, handlePrint, componentRef, ...res
             <p className='text-gray-600'>
                 Thank you for purchasing a ticket!
                 Your ticket has been emailed to you.
-                You can also screen shoot the QR code and use that to check-in.
+                You can also screenshot the QR code and use that to check-in.
             </p>
             }
 
