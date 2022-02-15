@@ -68,7 +68,9 @@ const slideAnimation = (index, prevTab) => {
 
 const DashTab = ({index, activeTab}) => {
     const [data, setData] = useState([]);
-    const [total, setTotal] = useState(0)
+    const [total, setTotal] = useState(0);
+    const [transactionFee, setTransactionFee] = useState(0);
+
     const columns = [
         {field: 'id', headerName: 'ID', width: 70, type: 'number'},
         {
@@ -95,9 +97,20 @@ const DashTab = ({index, activeTab}) => {
             .then(data => {
                 setData(data)
                 let sum = 0;
+                let transactionFeeSum = 0;
 
-                data.map(i => sum += i.total_paid)
-                setTotal(sum)
+                data.map(i => {
+                    const calTransactionFee = (n) => {
+                        const fee = (n * 0.0299 + 0.30);
+                        transactionFeeSum += fee;
+                        return n - fee
+                    }
+
+                    const paid = i.paid_venmo ? i.total_paid :  calTransactionFee(i.total_paid)
+                    sum += paid
+                })
+                setTransactionFee(transactionFeeSum.toFixed(2));
+                setTotal(sum.toFixed(2))
             })
             .catch(console.error)
     }, []);
@@ -105,16 +118,27 @@ const DashTab = ({index, activeTab}) => {
     return (
         <div className={`${slideAnimation(index, activeTab)}  w-full md:mt-10`}>
             <div className='flex flex-col p-2'>
-                <div className='flex mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
-                    <p className='text-2xl'>Total Sales:</p>
-                    <h1 className='text-4xl text-green-300'>${total}</h1>
+                <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
+                    <div className='text-center'>
+                        <p>Total Sales After Fees</p>
+                        <h1 className='text-4xl text-green-300'>${total}</h1>
+                    </div>
+                    <br/>
+                    <div className='text-center'>
+                        <p>Total Fees</p>
+                        <h1 className='text-4xl text-red-300'>${transactionFee}</h1>
+                    </div>
+                    <br/>
+                    <p className='text-center text-sm text-gray-400'>Note: Fees were not taken out for Venmo transactions</p>
+
+
                 </div>
 
-                <div className='bg-[#252525] mx-1 my-3 rounded h-[600px]'>
+                <div className='bg-[#252525] mx-1 my-3 rounded h-[520px]'>
                     <DataGrid
                         rows={data}
                         columns={columns}
-                        pageSize={9}
+                        pageSize={8}
                         rowsPerPageOptions={[5]}
                     />
                 </div>
