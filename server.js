@@ -31,7 +31,7 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     cookie: {
-        secure: true, // ENABLE ONLY ON HTTPS
+        secure: false, // ENABLE ONLY ON HTTPS
         maxAge: 14400000
     },
     store: new PostgreSqlStore({
