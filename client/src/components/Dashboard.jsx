@@ -109,7 +109,7 @@ const DashTab = ({index, activeTab}) => {
                         return n - fee
                     }
 
-                    const paid = i.paid_venmo ? i.total_paid :  calTransactionFee(i.total_paid)
+                    const paid = i.paid_w_venmo ? i.total_paid :  calTransactionFee(i.total_paid)
                     sum += paid
                 })
 
