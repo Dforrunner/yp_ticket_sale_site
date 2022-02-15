@@ -12,17 +12,6 @@ let workerBlob = createBlob(['./worker.js'], {
 // Props that are allowed to change dynamicly
 const propsKeys = ['delay', 'legacyMode', 'facingMode']
 
-const mirrorImage = (ctx, image, x = 0, y = 0, horizontal = false, vertical = false) =>{
-  ctx.save();  // save the current canvas state
-  ctx.setTransform(
-      horizontal ? -1 : 1, 0, // set the direction of x axis
-      0, vertical ? -1 : 1,   // set the direction of y axis
-      x + (horizontal ? image.width : 0), // set the x origin
-      y + (vertical ? image.height : 0)   // set the y origin
-  );
-  ctx.drawImage(image,0,0);
-  ctx.restore(); // restore the state as it was when this function was called
-}
 
 export default class QrReader extends Component {
   static defaultProps = {
@@ -340,13 +329,13 @@ export default class QrReader extends Component {
     const viewFinderStyle = {
       top: 140,
       left: 0,
-      zIndex: 1,
+      zIndex: 10,
       boxSizing: 'border-box',
-      border: '50px solid rgba(0, 0, 0, 0.5)',
-      boxShadow: 'inset 0 0 0 20px rgba(255, 255, 255, 0.1)',
+      border: '40px solid rgba(0, 0, 0, 0.0)',
+      boxShadow: 'inset 0 0 0 15px rgba(255, 255, 255, 0.4)',
       position: 'absolute',
       width: '100%',
-      height: '60%',
+      height: '60%'
     }
 
     return (

@@ -19,57 +19,78 @@ const generateTicket = (ticketId) =>
             });
     })
 
-const sendEmail = ({
-                       title,
-                       ticketId,
-                       firstname,
-                       lastname,
-                       product,
-                       qty,
-                       price,
-                       tipAmount,
-                       total,
-                       date_time,
-                       venue,
-                       email
-                   }) =>
-    generateTicket(ticketId)
+const send = (transponderNum, qrUrl, {
+    title,
+    ticketId,
+    firstname,
+    lastname,
+    product,
+    qty,
+    price,
+    tipAmount,
+    total,
+    date_time,
+    venue,
+    email
+}) => {
+    console.log('User email transponder number: ', transponderNum)
+    const use1 = transponderNum === 1;
+
+    let config = {
+        auth: {
+            user: use1 ? process.env.EMAIL_USER : process.env.EMAIL_USER2,
+            pass: use1 ? process.env.EMAIL_PASS : process.env.EMAIL_PASS2,
+        },
+    };
+
+    if (use1)
+        config.service = 'gmail';
+    else
+        config = {
+            name: use1 ? process.env.EMAIL_NAME : process.env.EMAIL_NAME2,
+            host: use1 ? process.env.EMAIL_HOST : process.env.EMAIL_HOST2,
+            port: Number(process.env.EMAIL_PORT), // set to 465 when deployed
+            secure: Number(process.env.EMAIL_PORT) === 465, // true for 465, false for other ports,
+            ...config
+        }
+
+
+    const transporter = nodemailer.createTransport( config);
+
+    transporter.use('compile', inlineBase64())
+
+    return transporter.sendMail({
+        from: config.auth.user, // sender address
+        to: `${email}, info@ypstl.com`,
+        subject: `✨5K Ball✨ Ticket 💃🕺 - ${firstname} ${lastname}`, // Subject line
+        html: emailTemplate({
+            ticketId,
+            title,
+            firstname,
+            lastname,
+            product,
+            qty,
+            price,
+            tipAmount,
+            total,
+            date_time,
+            venue,
+            email,
+            tipped: tipAmount > 0,
+            qrUrl
+        })
+    })
+        .then(console.log);
+};
+
+const sendEmail = (email) =>
+    generateTicket(email.ticketId)
         .then(qrUrl => {
-
-            let transporter = nodemailer.createTransport({
-                name: process.env.EMAIL_NAME,
-                host: process.env.EMAIL_HOST,
-                port: Number(process.env.EMAIL_PORT), // set to 465 when deployed
-                secure: Number(process.env.EMAIL_PORT) === 465, // true for 465, false for other ports
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
-                },
-            });
-
-            transporter.use('compile', inlineBase64())
-
-            return transporter.sendMail({
-                from: '"Young Professionals of St. Louis 👩🏿‍💼🧑🏻‍💼👩🏽‍💼🧑🏼‍💼" <info@ypstl.com>', // sender address
-                to: `${email}, info@ypstl.com`,
-                subject: `✨5K Ball✨ Ticket 💃🕺 - ${firstname} ${lastname}`, // Subject line
-                html: emailTemplate({
-                    ticketId,
-                    title,
-                    firstname,
-                    lastname,
-                    product,
-                    qty,
-                    price,
-                    tipAmount,
-                    total,
-                    date_time,
-                    venue,
-                    email,
-                    tipped: tipAmount > 0,
-                    qrUrl
+            send(1, qrUrl, email)
+                .catch(error => {
+                    console.error(error);
+                    send(2, qrUrl, email)
                 })
-            });
         })
         .catch(console.error)
 
@@ -90,7 +111,4 @@ module.exports = sendEmail;
 //     venue: 'Piper Palm House - Tower Grove Park',
 //     email: 'vtme-996@hotmail.com'
 // })
-//     .then(info => {
-//         console.log("Message sent: %s", info);
-//     })
 

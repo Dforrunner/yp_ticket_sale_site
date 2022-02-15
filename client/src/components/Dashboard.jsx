@@ -293,8 +293,8 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
     }
 
     return (
-        <div className={`${slideAnimation(index, prevTab)} w-full md:mt-10 h-screen`}>
-            <div className='flex justify-center items-center h-[84%] relative'>
+        <div className={`${slideAnimation(index, prevTab)} w-full md:mt-10 h-screen `}>
+            <div className='flex justify-center items-center h-[84%] overflow-hidden'>
                 {index === activeTab && <QrReader
                     delay={100}
                     style={{
@@ -307,7 +307,7 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
             </div>
 
             <div className='flex justify-center items-center w-full fixed bottom-20  h-[40px]'>
-                <p className='text-gray-300'>{msg}</p>
+                <p className='text-gray-300'>Code: {msg}</p>
             </div>
         </div>
     )

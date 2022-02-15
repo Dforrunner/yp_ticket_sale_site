@@ -379,7 +379,7 @@ const PrintTicket = forwardRef(({ticketVal, orderFormData, eventData}, ref) =>
     <div ref={ref}>
         <h1 className='text-3xl text-center my-10'>Digital Ticket</h1>
 
-        <div className='flex'>
+        <div className='flex flex-col justify-center items-center'>
             <div className='w-1/2'>
                 <QRCode
                     value={ticketVal}
