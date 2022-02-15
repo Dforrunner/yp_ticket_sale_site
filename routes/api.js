@@ -237,8 +237,11 @@ app.post('/payment-success', (req, res) => {
  */
 app.post("/create-payment-intent", (req, res) => {
 
+    const calTotal = (qty, price, tip) =>
+        ((qty * price) + Number(tip ? tip : 0)).toFixed(2);
+
     const {price, qty, email, firstname, lastname, tipAmount, additionalTickets} = req.body;
-    const total = (qty * price) + tipAmount
+    const total = calTotal(qty, price, tipAmount);
     let payIntent;
 
     query('SELECT * FROM product')

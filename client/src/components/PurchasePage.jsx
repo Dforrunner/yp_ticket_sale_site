@@ -18,6 +18,8 @@ const TipBtn = ({amount, setTip}) =>
             onClick={() => setTip(amount)}
     >${amount}</button>
 
+const calTotal = (qty, price, tip) =>
+    ((qty * price) + Number(tip ? tip : 0)).toFixed(2);
 
 const Checkout = ({
                       index,
@@ -62,7 +64,7 @@ const Checkout = ({
             emailConfirm: getVal('emailConfirm'),
             tipAmount: Number(getVal('tipAmount')),
             additionalTickets: extraTicketUsers,
-            total: (orderQty * price) + Number(tip ? tip : 0),
+            total: calTotal(orderQty, price, tip),
             price
         }
 
@@ -285,7 +287,7 @@ const OrderSummary = ({
                           children
                       }) => {
 
-    const total = (orderQty * productData.price) + Number(tip ? tip : 0)
+    const total = calTotal(orderQty, productData.price, tip);
 
     return (
         <div className='md:h-screen relative top-0'>
