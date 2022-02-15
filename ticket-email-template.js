@@ -51,15 +51,15 @@ const htmlOutput = ({
         <mj-text line-height=0>Name: ${firstname} ${lastname}</mj-text>
         <mj-divider border-width="1px" border-style="solid" border-color="lightgrey" />
         <mj-text align="left" font-weight=800 font-size="14px"> Order Info: </mj-text>
-        <mj-text line-height=0>Title: ${product}</mj-text>
-        <mj-text line-height=0>Quantity: ${qty}</mj-text>
-        <mj-text line-height=0>Purchase Price: $${price}</mj-text>
-        ${tipped ?'<mj-text line-height=0> Donation Amount: $'+tipAmount+' - Thank you! 😊 </mj-text>' : ''}
-        <mj-text line-height=0>Total: $${total}</mj-text>
+        <mj-text padding-bottom=0>Title: ${product}</mj-text>
+        <mj-text padding-bottom=0>Quantity: ${qty}</mj-text>
+        <mj-text padding-bottom=0>Purchase Price: $${price}</mj-text>
+        ${tipped ?'<mj-text padding-bottom=0> Donation Amount: $'+tipAmount+' - Thank you! 😊 </mj-text>' : ''}
+        <mj-text padding-bottom=0>Total: $${total}</mj-text>
         <mj-divider border-width="1px" border-style="solid" border-color="lightgrey" />
         <mj-text align="left" font-weight=800 font-size="14px"> Event Info: </mj-text>
-        <mj-text line-height=0>Event Date: ${date_time}</mj-text>
-        <mj-text line-height=0>Location: ${venue}</mj-text>
+        <mj-text padding-bottom=0>Event Date: ${date_time}</mj-text>
+        <mj-text padding-bottom=0>Location: ${venue}</mj-text>
       </mj-column>
     </mj-section>
     <mj-section>

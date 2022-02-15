@@ -12,7 +12,7 @@ const {ensureAuthenticated} = require('../auth');
  */
 app.get('/details', (req, res) => {
     query(`
-        SELECT *, CAST((product.qty - (SELECT COUNT(*) FROM transactions)) AS int) AS available_qty
+        SELECT *, CAST((product.qty - (SELECT COUNT(*) FROM transactions WHERE purchase_confirmed=TRUE)) AS int) AS available_qty
         FROM details
                  JOIN product ON product.id = details.id`)
         .then(rows => {
