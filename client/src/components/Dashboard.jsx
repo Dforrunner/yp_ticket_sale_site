@@ -92,7 +92,7 @@ const TransactionTab = ({index, setTab, data, activeTab}) => {
 
 
     const handleSearch = (str) => {
-        if(!str) return setRows(data);
+        if (!str) return setRows(data);
         const filteredRows = fixedData.filter(i => `${i.firstname} ${i.lastname}`.includes(str));
         setRows(filteredRows);
     }
@@ -133,6 +133,7 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
     const [total, setTotal] = useState(0);
     const [transactionFee, setTransactionFee] = useState(0);
     const [totalTips, setTotalTips] = useState(0);
+    const [totalVenmoSales, setTotalVenmoSales] = useState(0);
     const [ticketLimit, setTicketLimit] = useState(0);
     const [soldTickets, setSoldTickets] = useState(0);
 
@@ -150,6 +151,7 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
                 let sum = 0;
                 let transactionFeeSum = 0;
                 let tipSum = 0;
+                let venmoSum = 0;
 
                 const calTransactionFee = (n) => {
                     const fee = (n * 0.0299 + 0.30);
@@ -159,10 +161,12 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
 
                 transactions.map(i => {
                     tipSum += i.tip
+                    if (i.paid_w_venmo) venmoSum += i.total_paid;
                     const paid = i.paid_w_venmo ? i.total_paid : calTransactionFee(i.total_paid)
                     sum += paid
                 })
 
+                setTotalVenmoSales(venmoSum.toFixed(2))
                 setTotalTips(tipSum.toFixed(2));
                 setTransactionFee(transactionFeeSum.toFixed(2));
                 setTotal(sum.toFixed(2))
@@ -176,24 +180,26 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
                 <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
                     <div className='text-center'>
                         <p>Total Sales+Tips After Fees</p>
-                        <h1 className='text-4xl text-green-300'>${total}</h1>
+                        <h1 className='text-4xl text-green-400'>${total}</h1>
                     </div>
 
-                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
-                        <p>Total Fees:</p>
-                        <h1 className='text-3xl text-red-300'>${transactionFee}</h1>
-                    </div>
-
-                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
-                        <p>Total Donations:</p>
-                        <h1 className='text-3xl text-green-200'>${totalTips}</h1>
-                    </div>
-
+                    <table className='w-[300px] my-5'>
+                        <tr>
+                            <td>Venmo Sales:</td>
+                            <td className='text-3xl text-green-300 float-right'>${totalVenmoSales}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Fees:</td>
+                            <td className='text-3xl text-red-300 float-right'>${transactionFee}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Donations:</td>
+                            <td className='text-3xl text-green-200 float-right'>${totalTips}</td>
+                        </tr>
+                    </table>
 
                     <p className='text-center text-sm text-gray-400 mt-2'>Note: Fees were not taken out for Venmo
                         transactions to show accurate sales</p>
-
-
                 </div>
 
                 <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
@@ -202,15 +208,17 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
                         <h1 className='text-4xl text-blue-400'>{ticketLimit}</h1>
                     </div>
 
-                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
-                        <p>Sold:</p>
-                        <h1 className='text-3xl text-blue-300'>{soldTickets}</h1>
-                    </div>
+                    <table className='w-[200px] my-5'>
+                        <tr>
+                            <td>Sold:</td>
+                            <td className='text-3xl text-blue-300 float-right'>{soldTickets}</td>
+                        </tr>
+                        <tr>
+                            <td>Available:</td>
+                            <td className='text-3xl text-green-200 float-right'>{ticketLimit - soldTickets}</td>
+                        </tr>
+                    </table>
 
-                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
-                        <p>Available:</p>
-                        <h1 className='text-3xl text-blue-200'>{ticketLimit - soldTickets}</h1>
-                    </div>
                     <p className='text-center text-sm text-gray-400 mt-2'>Note: I subtracted 4 to save our spots</p>
                 </div>
 
