@@ -22,6 +22,7 @@ import {Checkbox, FormControlLabel, FormGroup, TextField} from "@mui/material";
 import Loader from "./Loader";
 import {DataGrid} from '@mui/x-data-grid';
 import QrReader from './QrReader'
+import SearchBar from "./SearchBar";
 
 const Navbar = ({tab, setTab, setPrevTab}) => {
 
@@ -66,12 +67,9 @@ const slideAnimation = (index, prevTab) => {
     return index > prevTab ? 'slideInRight' : 'slideInLeft'
 }
 
-const DashTab = ({index, activeTab}) => {
-    const [data, setData] = useState([]);
-    const [total, setTotal] = useState(0);
-    const [transactionFee, setTransactionFee] = useState(0);
-    const [totalTips, setTotalTips] = useState(0);
-
+const TransactionTab = ({index, setTab, data, activeTab}) => {
+    const fixedData = data;
+    const [rows, setRows] = useState(data);
     const columns = [
         {field: 'id', headerName: 'ID', width: 70, type: 'number'},
         {
@@ -92,11 +90,63 @@ const DashTab = ({index, activeTab}) => {
         {field: 'checked_in_by', headerName: 'By'},
     ];
 
+
+    const handleSearch = (str) => {
+        if(!str) return setRows(data);
+        const filteredRows = fixedData.filter(i => `${i.firstname} ${i.lastname}`.includes(str));
+        setRows(filteredRows);
+    }
+
+    return (
+
+        <div className={`${slideAnimation(index, activeTab)}  w-full h-screen md:mt-10`}>
+            <div
+                className='flex items-center p-3 bg-[#121212] md:bg-[#595959] md:mt-4 h-[50px] cursor-pointer'
+                onClick={() => setTab(0)}
+            >
+                <ArrowBackIcon/>
+                Back
+            </div>
+
+
+            <div className='bg-[#252525] mx-1 my-5 rounded h-[80%]'>
+                <div className='p-4'>
+                    <SearchBar onChange={e => handleSearch(e.target.value)}/>
+                </div>
+
+                <div className='h-[90%]'>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={10}
+                        rowsPerPageOptions={[10, 25, 50, 100, 200]}
+                    />
+                </div>
+
+
+            </div>
+        </div>
+    )
+}
+
+const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
+    const [total, setTotal] = useState(0);
+    const [transactionFee, setTransactionFee] = useState(0);
+    const [totalTips, setTotalTips] = useState(0);
+    const [ticketLimit, setTicketLimit] = useState(0);
+    const [soldTickets, setSoldTickets] = useState(0);
+
+
     useEffect(() => {
         fetch('/api/transactions')
             .then(res => res.json())
             .then(data => {
-                setData(data)
+
+                const {transactions, ticket_limit, sold_tickets} = data;
+                console.log(data)
+                setTransactionData(transactions);
+                setTicketLimit(ticket_limit);
+                setSoldTickets(sold_tickets);
                 let sum = 0;
                 let transactionFeeSum = 0;
                 let tipSum = 0;
@@ -107,9 +157,9 @@ const DashTab = ({index, activeTab}) => {
                     return n - fee
                 }
 
-                data.map(i => {
+                transactions.map(i => {
                     tipSum += i.tip
-                    const paid = i.paid_w_venmo ? i.total_paid :  calTransactionFee(i.total_paid)
+                    const paid = i.paid_w_venmo ? i.total_paid : calTransactionFee(i.total_paid)
                     sum += paid
                 })
 
@@ -121,7 +171,7 @@ const DashTab = ({index, activeTab}) => {
     }, []);
 
     return (
-        <div className={`${slideAnimation(index, activeTab)}  w-full md:mt-10`}>
+        <div className={`${slideAnimation(index, prevTab)}  w-full md:mt-10`}>
             <div className='flex flex-col p-2'>
                 <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
                     <div className='text-center'>
@@ -140,19 +190,40 @@ const DashTab = ({index, activeTab}) => {
                     </div>
 
 
-                    <p className='text-center text-sm text-gray-400 mt-2'>Note: Fees were not taken out for Venmo transactions to show accurate sales</p>
+                    <p className='text-center text-sm text-gray-400 mt-2'>Note: Fees were not taken out for Venmo
+                        transactions to show accurate sales</p>
 
 
                 </div>
 
-                <div className='bg-[#252525] mx-1 my-3 rounded h-[520px]'>
-                    <DataGrid
-                        rows={data}
-                        columns={columns}
-                        pageSize={8}
-                        rowsPerPageOptions={[5]}
-                    />
+                <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
+                    <div className='text-center'>
+                        <p>Ticket Limit</p>
+                        <h1 className='text-4xl text-blue-400'>{ticketLimit}</h1>
+                    </div>
+
+                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
+                        <p>Sold:</p>
+                        <h1 className='text-3xl text-blue-300'>{soldTickets}</h1>
+                    </div>
+
+                    <div className='text-center mt-2 flex justify-evenly items-center w-full'>
+                        <p>Available:</p>
+                        <h1 className='text-3xl text-blue-200'>{ticketLimit - soldTickets}</h1>
+                    </div>
+                    <p className='text-center text-sm text-gray-400 mt-2'>Note: I subtracted 4 to save our spots</p>
                 </div>
+
+                <div className='sticky bottom-0 mb-10 mt-3'>
+                    <div className='flex justify-center items-center mx-1 bg-[#3071BB]
+                                hover:bg-[#3584DF] h-[60px] text-white rounded'>
+
+                        <button className='w-full h-full cursor-pointer' type='button' onClick={() => handleTab(5)}>
+                            View Transactions
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     )
@@ -546,8 +617,12 @@ const Dashboard = () => {
     const [tab, setTab] = useState(0);
     const [prevTab, setPrevTab] = useState(0);
     const [scanData, setScanData] = useState([]);
+    const [transactionData, setTransactionData] = useState([])
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const handleTab = index =>
+        setTab(index)
 
     return (
         <div className='min-h-screen overflow-hidden text-white md:mt-10'>
@@ -558,6 +633,8 @@ const Dashboard = () => {
                     <DashTab
                         index={0}
                         prevTab={prevTab}
+                        handleTab={handleTab}
+                        setTransactionData={setTransactionData}
                     />}
 
                     {tab === 1 &&
@@ -565,7 +642,7 @@ const Dashboard = () => {
                         index={1}
                         activeTab={tab}
                         prevTab={prevTab}
-                        setTab={setTab}
+                        setTab={handleTab}
                         setScanData={setScanData}
                     />}
 
@@ -573,7 +650,7 @@ const Dashboard = () => {
                     <SettingsTab
                         index={2}
                         prevTab={prevTab}
-                        setTab={setTab}
+                        setTab={handleTab}
                         logout={auth.logout}
                         navigate={navigate}
                     />}
@@ -582,7 +659,7 @@ const Dashboard = () => {
                     <AccountTab
                         index={3}
                         prevTab={prevTab}
-                        setTab={setTab}
+                        setTab={handleTab}
                         user={auth.user}
                     />}
 
@@ -590,16 +667,24 @@ const Dashboard = () => {
                     <CheckinTab
                         index={4}
                         prevTab={prevTab}
-                        setTab={setTab}
+                        setTab={handleTab}
                         scanData={scanData}
                         setScanData={setScanData}
+                    />}
+
+                    {tab === 5 &&
+                    <TransactionTab
+                        index={5}
+                        activeTab={tab}
+                        setTab={setTab}
+                        data={transactionData}
                     />}
 
                 </div>
 
                 <Navbar
                     tab={tab}
-                    setTab={setTab}
+                    setTab={handleTab}
                     setPrevTab={setPrevTab}
                 />
             </ThemeProvider>

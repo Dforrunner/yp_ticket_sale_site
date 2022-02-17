@@ -12,14 +12,16 @@ const {ensureAuthenticated} = require('../auth');
  */
 app.get('/details', (req, res) => {
     query(`
-        SELECT *, CAST((product.qty - (SELECT COUNT(*) FROM transactions WHERE purchase_confirmed=TRUE)) AS int) AS available_qty
+        SELECT *,
+               CAST((product.qty -
+                     (SELECT SUM(qty) FROM transactions WHERE purchase_confirmed = TRUE)) AS int) AS available_qty
         FROM details
                  JOIN product ON product.id = details.id`)
         .then(rows => {
             res.json(rows[0]);
             res.end();
         })
-        .catch(err => console.log(err))
+        .catch(console.error)
 })
 
 /**
@@ -301,7 +303,7 @@ app.post('/transaction', ensureAuthenticated, (req, res) => {
 
     query('SELECT * FROM transactions WHERE ticket_id=$1 AND purchase_confirmed=TRUE', [ticketId])
         .then(rows => {
-            if(!rows.length)
+            if (!rows.length)
                 return res.json({error: 'User not found'}).end();
 
             const ticketData = rows[0];
@@ -329,9 +331,22 @@ app.post('/transaction', ensureAuthenticated, (req, res) => {
  * Get all transactions from the transactions DB table
  */
 app.get('/transactions', ensureAuthenticated, (req, res) => {
-    query('SELECT * FROM transactions WHERE purchase_confirmed=TRUE')
-        .then(rows => {
-            res.status(200).json(rows)
+
+    const queries = [
+        query(`SELECT ticket_limit,
+                      CAST((SELECT SUM(qty) FROM transactions WHERE purchase_confirmed = TRUE) as INT) as sold_tickets
+               FROM details`),
+        query(`SELECT *
+               FROM transactions
+               WHERE purchase_confirmed = TRUE`)
+    ]
+
+        Promise.all(queries)
+        .then(results => {
+            res.status(200).json({
+                ...results[0][0],
+                transactions: results[1]
+            })
             res.end()
         })
         .catch(err => {
