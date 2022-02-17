@@ -288,7 +288,6 @@ const CheckinTab = ({index, prevTab, setTab, scanData = [], setScanData}) => {
                         updatedData.push(i)
                 })
 
-                console.log({updatedData})
                 setScanData(updatedData);
 
                 const timer = setTimeout(() => {
