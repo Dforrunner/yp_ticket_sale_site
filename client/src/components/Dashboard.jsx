@@ -316,7 +316,7 @@ const CheckinTab = ({index, prevTab, setTab, scanData = [], setScanData}) => {
                 Back
             </div>
 
-            <h1 className='text-2xl text-center my-10'>Check In Customer</h1>
+            <h1 className='text-2xl text-center my-10 text-cyan-300'>Check In Customer</h1>
             <form onSubmit={handleSubmit}>
                 <FormGroup
                     sx={{
@@ -337,7 +337,7 @@ const CheckinTab = ({index, prevTab, setTab, scanData = [], setScanData}) => {
                                     />}
                                     label={`${user.full_name} ${user.mainBuyer ? ' - Buyer' : ''}`}/>
                             )
-                            : <h1 className='text-2xl text-center p-10 -ml-10'>Sing leUser</h1>
+                            : <h1 className='text-2xl text-center p-10 -ml-10'>{scanData[0].full_name}</h1>
                         }
                     </div>
                 </FormGroup>
@@ -389,7 +389,7 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
                     mainBuyer: true
                 }];
 
-                if (res.additionalTickets.length)
+                if (res.additionalTickets && res.additionalTickets.length)
                     res.additionalTickets.map(i => users.push({mainBuyer: false, ...i}))
 
                 setScanData(users)

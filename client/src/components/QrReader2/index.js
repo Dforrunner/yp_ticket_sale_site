@@ -184,7 +184,7 @@ const QrReader = ({
         position: 'absolute',
         overflow: 'hidden',
         width: '100%',
-        height: '100%',
+        height: '85%',
         transform: 'scaleX(-1)'
     }
     const videoPreviewStyle = {
@@ -194,7 +194,7 @@ const QrReader = ({
     }
 
     const viewFinderStyle = {
-        top: 140,
+        top: 100,
         left: 0,
         zIndex: 10,
         boxSizing: 'border-box',
