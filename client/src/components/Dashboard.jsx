@@ -21,7 +21,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {Checkbox, FormControlLabel, FormGroup, TextField} from "@mui/material";
 import Loader from "./Loader";
 import {DataGrid} from '@mui/x-data-grid';
-import QrReader from './QrReader'
+import QrReader from './QrReader2'
 import SearchBar from "./SearchBar";
 
 const Navbar = ({tab, setTab, setPrevTab}) => {
@@ -144,7 +144,6 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
             .then(data => {
 
                 const {transactions, ticket_limit, sold_tickets} = data;
-                console.log(data)
                 setTransactionData(transactions);
                 setTicketLimit(ticket_limit);
                 setSoldTickets(sold_tickets);
