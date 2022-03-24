@@ -63,7 +63,7 @@ app.post('/admin', (req, res) => {
             return;
         }
 
-        req.login(user, (err, user) => {
+        req.login(user, () => {
             res.status(200).json({isAuthenticated: true, user: user});
             res.end();
         })

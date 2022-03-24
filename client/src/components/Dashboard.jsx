@@ -129,14 +129,13 @@ const TransactionTab = ({index, setTab, data, activeTab}) => {
     )
 }
 
-const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
+const DashTab = ({index, prevTab, handleTab, setTransactionData, accessLevel}) => {
     const [total, setTotal] = useState(0);
     const [transactionFee, setTransactionFee] = useState(0);
     const [totalTips, setTotalTips] = useState(0);
     const [totalVenmoSales, setTotalVenmoSales] = useState(0);
     const [ticketLimit, setTicketLimit] = useState(0);
     const [soldTickets, setSoldTickets] = useState(0);
-
 
     useEffect(() => {
         fetch('/api/transactions')
@@ -176,6 +175,7 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
     return (
         <div className={`${slideAnimation(index, prevTab)}  w-full md:mt-10`}>
             <div className='flex flex-col p-2'>
+                {accessLevel === 2 &&
                 <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
                     <div className='text-center'>
                         <p>Total Sales+Tips After Fees</p>
@@ -183,24 +183,30 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
                     </div>
 
                     <table className='w-[300px] my-5'>
-                        <tr>
-                            <td>Venmo Sales:</td>
-                            <td className='text-3xl text-green-300 float-right'>${totalVenmoSales}</td>
-                        </tr>
-                        <tr>
-                            <td>Total Fees:</td>
-                            <td className='text-3xl text-red-300 float-right'>${transactionFee}</td>
-                        </tr>
-                        <tr>
-                            <td>Total Donations:</td>
-                            <td className='text-3xl text-green-200 float-right'>${totalTips}</td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td>Venmo Sales:</td>
+                                <td className='text-3xl text-green-300 float-right'>${totalVenmoSales}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Fees:</td>
+                                <td className='text-3xl text-red-300 float-right'>${transactionFee}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Donations:</td>
+                                <td className='text-3xl text-green-200 float-right'>${totalTips}</td>
+                            </tr>
+                        </tbody>
+
                     </table>
 
                     <p className='text-center text-sm text-gray-400 mt-2'>Note: Fees were not taken out for Venmo
                         transactions to show accurate sales</p>
                 </div>
+                }
 
+
+                {accessLevel === 2 &&
                 <div className='flex flex-col mx-1 my-3 bg-[#252525] justify-between items-center p-5 rounded'>
                     <div className='text-center'>
                         <p>Ticket Limit</p>
@@ -208,18 +214,22 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData}) => {
                     </div>
 
                     <table className='w-[200px] my-5'>
-                        <tr>
-                            <td>Sold:</td>
-                            <td className='text-3xl text-blue-300 float-right'>{soldTickets}</td>
-                        </tr>
-                        <tr>
-                            <td>Available:</td>
-                            <td className='text-3xl text-green-200 float-right'>{ticketLimit - soldTickets}</td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td>Sold:</td>
+                                <td className='text-3xl text-blue-300 float-right'>{soldTickets}</td>
+                            </tr>
+                            <tr>
+                                <td>Available:</td>
+                                <td className='text-3xl text-green-200 float-right'>{ticketLimit - soldTickets}</td>
+                            </tr>
+                        </tbody>
                     </table>
 
                     <p className='text-center text-sm text-gray-400 mt-2'>Note: I subtracted 4 to save our spots</p>
                 </div>
+                }
+
 
                 <div className='sticky bottom-0 mb-10 mt-3'>
                     <div className='flex justify-center items-center mx-1 bg-[#3071BB]
@@ -359,11 +369,6 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
     const [msg, setMsg] = useState('');
 
     const getTransaction = (ticketId) => {
-        if (!ticketId || ticketId.split('_')[0] !== 'ypstl') {
-            setMsg('Invalid Code')
-            return;
-        }
-        setMsg('')
         setIsLoading(true);
         fetch('/api/transaction', {
             method: 'POST',
@@ -394,10 +399,13 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
     }
 
     const handleScan = (value) => {
-        setMsg(value)
-        console.log('VAL', value);
-        if (Array.isArray(value)) value = value[0];
-        getTransaction(value)
+        if (!value || value.split('_')[0] !== 'ypstl') {
+            setMsg('Invalid Code')
+        }else{
+            setMsg('')
+            if (Array.isArray(value)) value = value[0];
+            getTransaction(value)
+        }
     }
 
     const handleError = (err) => {
@@ -433,7 +441,7 @@ const CustomInput = ({...rest}) =>
         />
     </div>
 
-const AccountTab = ({index, prevTab, setTab, user}) => {
+const AccountTab = ({index, prevTab, setTab, user, accessLevel}) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [msg, setMsg] = useState('');
@@ -555,17 +563,24 @@ const AccountTab = ({index, prevTab, setTab, user}) => {
                         error={passErr}
                     />
 
+                    {accessLevel === 2 &&
                     <CustomInput
                         label="New Password (Optional)"
                         name='newPass'
                         type='password'
                     />
+                    }
+
+                    {accessLevel === 2 &&
                     <CustomInput
                         label="Confirm Password (Optional)"
                         name='confirmPass'
                         type='password'
                         error={confirmErr}
                     />
+                    }
+
+
                 </div>
 
                 <div className='flex justify-center items-center h-[40px]'>
@@ -585,7 +600,7 @@ const AccountTab = ({index, prevTab, setTab, user}) => {
     )
 }
 
-const SettingsTab = ({index, prevTab, setTab, logout, navigate}) => {
+const SettingsTab = ({index, prevTab, setTab, logout, navigate, fullName}) => {
 
     const handleLogout = () => {
         logout()
@@ -600,7 +615,7 @@ const SettingsTab = ({index, prevTab, setTab, logout, navigate}) => {
                 <div className='rounded-full p-5 bg-white mt-10'>
                     <ManageAccountsIcon style={{fontSize: 80, color: 'black'}}/>
                 </div>
-                <h1 className='text-3xl mb-10 mt-3'>Mo Barut</h1>
+                <h1 className='text-3xl mb-10 mt-3'>{fullName}</h1>
 
                 <List className='w-[90%] rounded bg-gray-300 text-black overflow-hidden' style={{padding: 0}}>
                     <CustomListItem
@@ -625,6 +640,7 @@ const Dashboard = () => {
     const [scanData, setScanData] = useState([]);
     const [transactionData, setTransactionData] = useState([])
     const auth = useContext(AuthContext);
+    const accessLevel = auth.user.access_level;
     const navigate = useNavigate();
 
     const handleTab = index =>
@@ -641,6 +657,7 @@ const Dashboard = () => {
                         prevTab={prevTab}
                         handleTab={handleTab}
                         setTransactionData={setTransactionData}
+                        accessLevel={accessLevel}
                     />}
 
                     {tab === 1 &&
@@ -658,6 +675,7 @@ const Dashboard = () => {
                         prevTab={prevTab}
                         setTab={handleTab}
                         logout={auth.logout}
+                        fullName={`${auth.user.firstname} ${auth.user.lastname}`}
                         navigate={navigate}
                     />}
 
@@ -667,6 +685,7 @@ const Dashboard = () => {
                         prevTab={prevTab}
                         setTab={handleTab}
                         user={auth.user}
+                        accessLevel={accessLevel}
                     />}
 
                     {tab === 4 &&

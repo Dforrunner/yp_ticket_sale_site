@@ -1,4 +1,4 @@
-import React, {useEffect, createContext, useState} from "react";
+import React, {useEffect, createContext} from "react";
 import {useLocalStorage} from "../../hooks";
 
 export const AuthContext = createContext(null);

@@ -26,7 +26,7 @@ const QrReader = ({
                       onScan,
                       className,
                       showViewFinder = true,
-                      delay = 500,
+                      delay = 800,
                       resolution = 600,
                   }) => {
 
@@ -144,16 +144,18 @@ const QrReader = ({
 
         if (previewIsPlaying) {
             const ctx = canvas.getContext('2d')
-            ctx.drawImage(preview, hozOffset, vertOffset, width, height)
-            //mirrorImage(ctx, preview, hozOffset, vertOffset, true, false)
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
-            decoder(imageData)
-                .then(code => {
-                    code
-                        ? onScan(code)
-                        : setTimeout(check, delay)
-                })
+            const decode = () => {
+                ctx.drawImage(preview, hozOffset, vertOffset, width, height)
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+                decoder(imageData)
+                    .then(code => {
+                        timeout = setTimeout(decode, delay);
+                        if (code) onScan(code)
+                    })
+            }
+
+            decode()
         } else {
             // Preview not ready -> check later
             timeout = setTimeout(check, delay)

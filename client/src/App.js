@@ -1,5 +1,5 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-import { PosterPage, PurchasePage, LoginPg, Dashboard} from "./components";
+import { PosterPage, PurchasePage, LoginPg, WaiverPg, Dashboard} from "./components";
 import {RequireAuth} from "./components/Auth";
 
 const App = () => {

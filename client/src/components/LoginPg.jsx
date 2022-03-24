@@ -17,7 +17,6 @@ const LoginPg = () => {
 
         auth.login(username, password)
             .then(({isAuthenticated, error}) => {
-                console.log({isAuthenticated, error})
                 if (isAuthenticated) navigate('/admin/dashboard')
                 if(error) setError(error);
             })
