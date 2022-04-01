@@ -184,18 +184,18 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData, accessLevel}) =
 
                     <table className='w-[300px] my-5'>
                         <tbody>
-                            <tr>
-                                <td>Venmo Sales:</td>
-                                <td className='text-3xl text-green-300 float-right'>${totalVenmoSales}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Fees:</td>
-                                <td className='text-3xl text-red-300 float-right'>${transactionFee}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Donations:</td>
-                                <td className='text-3xl text-green-200 float-right'>${totalTips}</td>
-                            </tr>
+                        <tr>
+                            <td>Venmo Sales:</td>
+                            <td className='text-3xl text-green-300 float-right'>${totalVenmoSales}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Fees:</td>
+                            <td className='text-3xl text-red-300 float-right'>${transactionFee}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Donations:</td>
+                            <td className='text-3xl text-green-200 float-right'>${totalTips}</td>
+                        </tr>
                         </tbody>
 
                     </table>
@@ -215,14 +215,14 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData, accessLevel}) =
 
                     <table className='w-[200px] my-5'>
                         <tbody>
-                            <tr>
-                                <td>Sold:</td>
-                                <td className='text-3xl text-blue-300 float-right'>{soldTickets}</td>
-                            </tr>
-                            <tr>
-                                <td>Available:</td>
-                                <td className='text-3xl text-green-200 float-right'>{ticketLimit - soldTickets}</td>
-                            </tr>
+                        <tr>
+                            <td>Sold:</td>
+                            <td className='text-3xl text-blue-300 float-right'>{soldTickets}</td>
+                        </tr>
+                        <tr>
+                            <td>Available:</td>
+                            <td className='text-3xl text-green-200 float-right'>{ticketLimit - soldTickets}</td>
+                        </tr>
                         </tbody>
                     </table>
 
@@ -325,20 +325,17 @@ const CheckinTab = ({index, prevTab, setTab, scanData = [], setScanData}) => {
                 >
 
                     <div className='ml-10 pb-[300px]'>
-                        {scanData.length > 1
-                            ? scanData.map((user, index) =>
-                                <FormControlLabel
-                                    key={`${user.full_name}_${user.id}_${index}`}
-                                    control={<Checkbox
-                                        name='user[]'
-                                        value={user.id}
-                                        defaultChecked={user.checked_in}
-                                        disabled={user.checked_in}
-                                    />}
-                                    label={`${user.full_name} ${user.mainBuyer ? ' - Buyer' : ''}`}/>
-                            )
-                            : <h1 className='text-2xl text-center p-10 -ml-10'>{scanData[0].full_name}</h1>
-                        }
+                        {scanData.map((user, index) =>
+                            <FormControlLabel
+                                key={`${user.full_name}_${user.id}_${index}`}
+                                control={<Checkbox
+                                    name='user[]'
+                                    value={user.id}
+                                    defaultChecked={user.checked_in}
+                                    disabled={user.checked_in}
+                                />}
+                                label={`${user.full_name} ${user.mainBuyer ? ' - Buyer' : ''}`}/>
+                        )}
                     </div>
                 </FormGroup>
 
@@ -401,7 +398,7 @@ const ScanTab = ({index, prevTab, activeTab, setTab, setScanData}) => {
     const handleScan = (value) => {
         if (!value || value.split('_')[0] !== 'ypstl') {
             setMsg('Invalid Code')
-        }else{
+        } else {
             setMsg('')
             if (Array.isArray(value)) value = value[0];
             getTransaction(value)
