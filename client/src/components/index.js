@@ -1,4 +1,5 @@
 export {default as PosterPage} from './PosterPage';
+export {default as HalloweenPosterPage} from './HalloweenPosterPage';
 export {default as Footer} from './Footer'
 export {default as GlitterRainBg} from './GlitterRainBg';
 export {default as CountdownTimer} from './CountdownTimer';

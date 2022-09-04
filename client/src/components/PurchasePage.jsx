@@ -2,13 +2,24 @@ import React, {forwardRef, useRef, useState} from "react";
 import {loadStripe} from "@stripe/stripe-js";
 import {Elements} from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
-import {FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField} from "@mui/material";
+import {
+    Button,
+    Drawer,
+    FormControl,
+    InputAdornment,
+    InputLabel,
+    MenuItem,
+    OutlinedInput,
+    Select,
+    TextField
+} from "@mui/material";
 import SliderTabs from "./SliderTabs";
 import {useLocation, Navigate} from 'react-router-dom'
 import Loader from "./Loader";
 import QRCode from 'qrcode.react';
 import {useReactToPrint} from "react-to-print";
 import InputField from "./InputField";
+import WaiverForm from "./WaiverForm";
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
 
@@ -41,6 +52,8 @@ const Checkout = ({
 
     const [emailErr, setEmailErr] = useState(false);
     const [qtyErr, setQtyErr] = useState(false);
+    const [firstname, setFirstName] = useState('');
+    const [lastname, setLastName] = useState('');
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -101,7 +114,7 @@ const Checkout = ({
                         }}
                         name='product'
                         label="Product Name"
-                        value={product_name}/>
+                        value={`${product_name} - tickets`}/>
 
                     <FormControl
                         style={{
@@ -154,11 +167,13 @@ const Checkout = ({
                         required
                         label="First Name"
                         name='firstname'
+                        onChange={e => setFirstName(e.target.value)}
                     />
                     <InputField
                         required
                         label="Last Name"
                         name='lastname'
+                        onChange={e => setLastName(e.target.value)}
                     />
                     <InputField
                         required
@@ -195,6 +210,14 @@ const Checkout = ({
                         </div>
                     )}
                 </div>
+            </div>
+
+            <div className='mt-6'>
+                <WaiverForm
+                    fullname={`${firstname} ${lastname}`}
+                    productName={product_name}
+                    disabled={!firstname.length || !lastname.length}
+                />
             </div>
 
             {request_tip &&
