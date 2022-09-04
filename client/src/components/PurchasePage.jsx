@@ -54,9 +54,18 @@ const Checkout = ({
     const [qtyErr, setQtyErr] = useState(false);
     const [firstname, setFirstName] = useState('');
     const [lastname, setLastName] = useState('');
+    const [waiverData, setWaiverData] = useState('');
+    const [waiverErr, setWaiverErr] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+
+        if(!waiverData){
+            setWaiverErr(true);
+            return;
+        }
+        setWaiverErr(false);
 
         if (isLoading) return;
 
@@ -78,6 +87,7 @@ const Checkout = ({
             tipAmount: Number(getVal('tipAmount')),
             additionalTickets: extraTicketUsers,
             total: calTotal(orderQty, price, tip),
+            waiverData,
             price
         }
 
@@ -217,6 +227,9 @@ const Checkout = ({
                     fullname={`${firstname} ${lastname}`}
                     productName={product_name}
                     disabled={!firstname.length || !lastname.length}
+                    handleData={data => setWaiverData(data)}
+                    waiverErr={waiverErr}
+                    setWaiverErr={setWaiverErr}
                 />
             </div>
 

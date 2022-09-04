@@ -242,9 +242,11 @@ app.post("/create-payment-intent", (req, res) => {
     const calTotal = (qty, price, tip) =>
         ((qty * price) + Number(tip ? tip : 0)).toFixed(2);
 
-    const {price, qty, email, firstname, lastname, tipAmount, additionalTickets} = req.body;
+    const {price, qty, email, firstname, lastname, tipAmount, additionalTickets, waiverData} = req.body;
     const total = calTotal(qty, price, tipAmount);
+    const userName = `${firstname} ${lastname}`
     let payIntent;
+    let transactionId;
 
     query('SELECT * FROM product')
         .then(rows => {
@@ -276,12 +278,15 @@ app.post("/create-payment-intent", (req, res) => {
                 [firstname, lastname, price, ticketId, email, paymentIntent.id, qty, total, tipAmount])
 
         })
-        .then(rows => insertId = rows[0].id)
-        .then(id => {
+        .then(rows => transactionId = rows[0].id)
+        .then(_ => query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
+                          VALUES ($1, $2, $3, $4, $5, $6)`,
+            [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]))
+        .then(_ => {
             if (!additionalTickets.length) return;
 
             const rows = []
-            additionalTickets.map(i => rows.push([i, id]))
+            additionalTickets.map(i => rows.push([i, transactionId]))
             const sql = format('INSERT INTO extra_tickets (full_name, buyer_id) VALUES %L', rows);
 
             return query(sql, [])

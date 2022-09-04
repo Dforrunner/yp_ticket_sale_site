@@ -1,5 +1,5 @@
 import {Button, Drawer, TextField} from "@mui/material";
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import SignatureCanvas from 'react-signature-canvas'
 
 const conditions = {
@@ -33,28 +33,40 @@ of such provision, as the case may be, and such invalid or unenforceable provisi
 deemed not to be a part of this Agreement.`
 }
 
-const WaiverForm = ({fullname, disabled, productName}) => {
+let eName = '';
+let eRelation = '';
+let eNum = '';
+let signature;
+
+const WaiverForm = ({
+                        fullname,
+                        disabled,
+                        productName,
+                        handleData = () => {},
+                        waiverErr,
+                        setWaiverErr
+                    }) => {
     const [openWaiverDrawer, setOpenWaiverDrawer] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    const [eName, setEName] = useState('');
-    const [eRelation, setERelation] = useState('');
-    const [eNum, setENum] = useState('');
     const [eNameErr, setENameErr] = useState(false);
     const [eNumErr, setENumErr] = useState(false);
     const [sigErr, setSigErr] = useState(false);
-    let signature;
+    const [waiverSuccess, setWaiverSuccess] = useState(false);
 
-    const handleSubmit = (e) => {
+
+    const handleSubmit = () => {
         setSubmitted(true);
 
-        if(!eName) setENameErr(true)
-        if(!eNum) setENumErr(true);
-        if(!signature || (signature && signature.isEmpty())) setSigErr(true);
+        !eName ? setENameErr(true) : setENameErr(false);
+        !eNum ? setENumErr(true) : setENumErr(false);
+        !signature || (signature && signature.isEmpty()) ? setSigErr(true) : setSigErr(false);
 
-        if(signature){
-            console.log(signature.toDataURL())
+        if (!eNameErr && !eNumErr && !sigErr && eName && eNum && !signature.isEmpty()) {
+            handleData({eName, eRelation, eNum, signature: signature.toDataURL()})
+            setWaiverErr(false);
+            setOpenWaiverDrawer(false);
+            setWaiverSuccess(true)
         }
-
     }
 
     const CustomInput = ({name, err, ...rest}) =>
@@ -78,7 +90,20 @@ const WaiverForm = ({fullname, disabled, productName}) => {
             <p className='text-black text-sm text-gray-800 py-6 px-2'>
                 Please read and complete the waiver prior to the event.
             </p>
-            <Button disabled={disabled} variant="contained" onClick={() => setOpenWaiverDrawer(true)}>Read & Complete Waiver</Button>
+
+            <div>
+                <Button
+                    disabled={disabled}
+                    variant="contained"
+                    color={waiverSuccess ? 'success' : 'primary'}
+                    onClick={() => setOpenWaiverDrawer(true)}
+                >
+                    Read & Complete Waiver
+                </Button>
+
+                {waiverErr && <p className='text-red-500'>Please read and complete the waiver</p>}
+            </div>
+
             <Drawer
                 anchor={'bottom'}
                 open={openWaiverDrawer}
@@ -98,8 +123,8 @@ const WaiverForm = ({fullname, disabled, productName}) => {
                     </p>
 
                     {Object.keys(conditions).map((val, index) =>
-                        <p className='mt-6' key={val+index}>
-                            <b>{index+1}. {val}.</b> {conditions[val]}
+                        <p className='mt-6' key={val + index}>
+                            <b>{index + 1}. {val}.</b> {conditions[val]}
                         </p>
                     )}
 
@@ -109,18 +134,24 @@ const WaiverForm = ({fullname, disabled, productName}) => {
                         <CustomInput
                             name='e-contact-name'
                             err={eNameErr && submitted}
+                            defaultValue={eName}
+                            onChange={e => eName = e.target.value}
                         />
                         (Relationship:
                         <CustomInput
                             name='e-contact-relation'
+                            defaultValue={eRelation}
+                            onChange={e => eRelation = e.target.value}
                         />
                         at
                         <CustomInput
                             name='e-contact-number'
                             err={eNumErr && submitted}
+                            defaultValue={eNum}
+                            onChange={e => eNum = e.target.value}
                         />
 
-                        <div className='mt-6' >
+                        <div className='mt-6'>
                             <b>Signature</b> Please sign in the box below:
 
                             <div style={{width: '500px', border: sigErr ? '2px solid red' : 'none'}}>
@@ -131,12 +162,18 @@ const WaiverForm = ({fullname, disabled, productName}) => {
                                                  ref={(ref) => signature = ref}
 
                                 />
+
+                                <Button onClick={() => {
+                                    if (signature) signature.clear();
+                                }} variant='outlined' className='float-right'>Clear</Button>
                             </div>
 
                         </div>
 
                         <div className='mt-6 h-[200px]'>
-                            {eNameErr || eNumErr || sigErr ? <p className='text-red-500 '>Missing required data. Complete lines highlighted in red.</p> : ''}
+                            {eNameErr || eNumErr || sigErr ?
+                                <p className='text-red-500 '>Missing required data. Complete lines highlighted in
+                                    red.</p> : ''}
                             <Button variant="contained" type='button' onClick={() => handleSubmit()}>Submit</Button>
                         </div>
                     </div>
