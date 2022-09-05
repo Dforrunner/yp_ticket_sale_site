@@ -4,7 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Mystery+Quest&display=swap');
 @import url("https://fonts.googleapis.com/css?family=Raleway:900");
-@import url(https://fonts.googleapis.com/css?family=Oswald);
+@import url("https://fonts.googleapis.com/css?family=Oswald");
 
 * html {
   padding: 0;
@@ -252,7 +252,7 @@ body {
   position: absolute;
   width: 20px;
   height: 20px;
-  border: 3px solid #fff;
+  border: 3px solid;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   border-color: #fff transparent transparent transparent;
