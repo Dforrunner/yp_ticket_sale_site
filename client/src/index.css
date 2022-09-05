@@ -352,12 +352,12 @@ body {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
   opacity: 0.4;
   pointer-events: none;
-  position: absolute;
+  position: fixed;
   overflow: hidden;
-  top: 400px;
+  top: 250px;
   left: 0;
   right: 0;
-  height: 100%;
+  height: 500px;
   transform: scale(1, 2);
 }
 

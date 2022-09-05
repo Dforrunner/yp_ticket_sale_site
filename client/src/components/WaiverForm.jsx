@@ -52,7 +52,7 @@ const WaiverForm = ({
     const [eNumErr, setENumErr] = useState(false);
     const [sigErr, setSigErr] = useState(false);
     const [waiverSuccess, setWaiverSuccess] = useState(false);
-
+    const signaturePadWidth = window.innerWidth > 640 ? 600 : 300;
 
     const handleSubmit = () => {
         setSubmitted(true);
@@ -109,9 +109,9 @@ const WaiverForm = ({
                 open={openWaiverDrawer}
                 onClose={() => setOpenWaiverDrawer(false)}
             >
-                <div className='h-[90vh] md:p-20'>
+                <div className='h-[90vh] p-10 md:p-20' >
                     <div className='flex flex-row justify-between h-[30px]'>
-                        <h1 className='font-bold text-2xl'>RELEASE OF LIABILITY</h1>
+                        <h1 className='font-bold md:text-2xl'>RELEASE OF LIABILITY</h1>
                         <Button variant="outlined" onClick={() => setOpenWaiverDrawer(false)}>Close</Button>
                     </div>
 
@@ -154,11 +154,10 @@ const WaiverForm = ({
                         <div className='mt-6'>
                             <b>Signature</b> Please sign in the box below:
 
-                            <div style={{width: '500px', border: sigErr ? '2px solid red' : 'none'}}>
+                            <div style={{width: signaturePadWidth, backgroundColor:'rgba(0,0,0,0.3)', border: sigErr ? '2px solid red' : 'none'}}>
 
                                 <SignatureCanvas penColor='black'
-                                                 canvasProps={{width: 500, height: 200, className: 'sigCanvas'}}
-                                                 backgroundColor='rgba(0,0,0,0.2)'
+                                                 canvasProps={{width: signaturePadWidth, height: 200, className: 'sigCanvas'}}
                                                  ref={(ref) => signature = ref}
 
                                 />
