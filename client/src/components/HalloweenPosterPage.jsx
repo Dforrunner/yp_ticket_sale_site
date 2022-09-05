@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import Footer from "./Footer";
 import ScrollLink from "./ScrollLink";
 import FullMoon from "./FullMoon";
+import BlobButton from "./BlobButton";
 
 const HalloweenPosterPage = () => {
     const [details, setDetails] = useState({});
@@ -22,28 +23,27 @@ const HalloweenPosterPage = () => {
 
     return (
         <div>
-            <div className='px-5 pt-5 flex flex-col justify-center items-center h-full'>
-                <Logo/>
+            <div className='px-5 flex flex-col justify-center items-center h-full'>
+                {/*<Logo/>*/}
                 {/*<GlitterRainBg/>*/}
 
                 <FullMoon />
 
                 <div className='z-10'>
 
+                    {/*<div className='text-center mt-20'>*/}
+                    {/*    <h1 className='w-full text-white text-3xl md:text-4xl font-mystery-quest'> {details.title} </h1>*/}
+                    {/*    <h2 className='font-creepster text-7xl md:text-9xl -mt-3 text-gold'>{details.subtitle}</h2>*/}
+                    {/*</div>*/}
 
-                    <div className='text-center mt-20'>
-                        <h1 className='w-full text-white text-3xl md:text-4xl font-mystery-quest'> {details.title} </h1>
-                        <h2 className='font-creepster text-7xl md:text-9xl -mt-3 text-gold'>{details.subtitle}</h2>
+                    <div className='text-center mt-[1020px]'>
+                        <p className='text-[#C65000] font-creepster text-2xl md:text-5xl'>{details.date_time}</p>
+                        <p className='text-[#C65000] text-base'>{details.venue}</p>
                     </div>
 
                     <div className='text-center mt-20'>
-                        <p className='text-white text-2xl md:text-3xl'>{details.date_time}</p>
-                        <p className='text-white text-base'>{details.venue}</p>
-                    </div>
-
-                    <div className='text-center mt-20'>
-                        <p className='text-white text-2xl md:text-3xl'>{details.dj_name}</p>
-                        <p className='text-white text-base'>{details.dj_ig}</p>
+                        <p className='text-[#C65000] text-2xl md:text-3xl'>{details.dj_name}</p>
+                        <p className='text-[#C65000] text-base'>{details.dj_ig}</p>
                     </div>
 
                     {!soldOut &&
@@ -51,12 +51,12 @@ const HalloweenPosterPage = () => {
 
                         <div className='flex flex-col w-full justify-center items-center mx-2 -mr-20'>
                             {details.on_sale &&
-                            <div className='text-white px-5 py-2 m-5 text-2xl
-                                            bg-red-500 rounded-full -mt-8'>
+                            <div className='text-white font-mystery-quest px-5 py-2 m-5 text-2xl
+                                            bg-red-500 rounded-full -mt-10'>
                                 ON SALE!
                             </div>}
 
-                            <div className='text-white'>
+                            <div className='text-white font-mystery-quest'>
                                 <span className='text-4xl'>
                                     ${details.price}
                                 </span>
@@ -64,7 +64,7 @@ const HalloweenPosterPage = () => {
                                     ${details.next_price}
                                 </span>
                             </div>
-                            <div className='text-[#FE2042] p-3'>
+                            <div className='text-[#FE2042] font-mystery-quest  p-3'>
                                 <span>SALE ENDS IN </span>
                                 <CountdownTimer expireDate={details.sale_exp}/>
                             </div>
@@ -85,11 +85,13 @@ const HalloweenPosterPage = () => {
                             : <ScrollLink
                                 to='ticket-purchase'
                                 state={details}
-                                className='my-5 p-3 rounded-[3%] w-64 cursor-pointer bg-gold text-2xl
-                                 text-white text-center font-semibold'
+                                className='p-3 rounded-[3%] w-64 cursor-pointer bg-[#C65000] hover:bg-[#570101FF] text-3xl
+                                 text-white text-center font-creepster'
                             >Buy Tickets
                             </ScrollLink>
                         }
+
+
 
 
                     </div>

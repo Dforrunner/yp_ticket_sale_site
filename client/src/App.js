@@ -4,7 +4,7 @@ import {RequireAuth} from "./components/Auth";
 
 const App = () => {
     return (
-        <div className='gradient-bg-welcome w-full'>
+        <div className='spooky-bg w-full'>
             <BrowserRouter>
                 <Routes>
                     <Route path='/' exact element={<HalloweenPosterPage/>}/>

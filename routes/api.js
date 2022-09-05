@@ -14,7 +14,7 @@ app.get('/details', (req, res) => {
     query(`
         SELECT *,
                CAST((product.qty -
-                     (SELECT SUM(qty) FROM transactions WHERE purchase_confirmed = TRUE)) AS int) AS available_qty
+                     (SELECT COALESCE(SUM(qty),0) FROM transactions WHERE purchase_confirmed = TRUE)) AS int) AS available_qty
         FROM details
                  JOIN product ON product.id = details.id`)
         .then(rows => {

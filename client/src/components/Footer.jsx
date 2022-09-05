@@ -1,5 +1,5 @@
 const Footer = ({classes}) =>
-        <div className={`bottom-0 w-full flex justify-center items-center flex-col p-4 gradient-bg-footer ${classes}`}>
+        <div className={`bottom-0 w-full flex justify-center items-center flex-col p-4 spooky-bg ${classes}`}>
             <div className='flex justify-center items-center flex-col mt-5'>
                 <p className='text-white text-sm test-center'>Come join us</p>
                 <p className='text-white text-sm test-center'>info@ypstl.com</p>
