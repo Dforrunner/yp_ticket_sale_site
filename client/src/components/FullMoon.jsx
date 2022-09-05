@@ -2,10 +2,10 @@
 
 const FullMoon = () => {
     //654 768
-    const width = 900;
+    const width = window.innerWidth > 600;
     const height = 1300;//width='${width}px' height='${height}px'
 
-    const body =`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width='500px' height='800px' viewBox="0 0 833 1019">
+    const body =`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width='100%' height='100%' viewBox="0 0 833 1019">
   <defs>
     <radialGradient id="a" cx="297.55" cy="265.38" r="91.96" fx="297.55" fy="265.38" gradientTransform="matrix(1.17 0 0 1.17 -74.54 -62.14)" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#7d7d7f"/>
