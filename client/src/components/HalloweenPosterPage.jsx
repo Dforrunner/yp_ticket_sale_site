@@ -1,5 +1,4 @@
-import Logo from "./Logo";
-import {CountdownTimer, GlitterRainBg} from "./index";
+import {CountdownTimer} from "./index";
 import {useEffect, useState} from "react";
 import Footer from "./Footer";
 import ScrollLink from "./ScrollLink";
@@ -8,11 +7,15 @@ import FullMoon from "./FullMoon";
 const bats = (numberOfBats = 1) => {
 
     for (let i = 0; i < numberOfBats; i++) {
-        let r = Math.random, n = 0, d = document, w = window,
+        let r = Math.random,
+            n = 0,
+            d = document,
+            w = window,
             i = d.createElement('img'),
             z = d.createElement('div'),
             zs = z.style,
             a = w.innerWidth * r(), b = w.innerHeight * r();
+        z.classList.add('flying-bats')
         zs.position = "fixed";
         zs.left = 0;
         zs.top = 0;
@@ -25,7 +28,7 @@ const bats = (numberOfBats = 1) => {
 
         const A = () => {
             let x = R(a, w.innerWidth), y = R(b, w.innerHeight),
-                d = 10 * Math.sqrt((a - x) * (a - x) + (b - y) * (b - y));
+                d = 7 * Math.sqrt((a - x) * (a - x) + (b - y) * (b - y));
             zs.opacity = n;
             n = 1;
             zs.transition = zs.transition = d / 1e3 + 's linear';
@@ -40,6 +43,9 @@ const bats = (numberOfBats = 1) => {
 
 }
 
+const removeBats = () => {
+    document.querySelectorAll('.flying-bats').forEach(e => e.remove());
+}
 
 const HalloweenPosterPage = () => {
     const [details, setDetails] = useState({});
@@ -55,14 +61,15 @@ const HalloweenPosterPage = () => {
                 if (details.available_qty <= 0)
                     setSoldOut(true)
             })
+
+        return () => {
+            removeBats()
+        }
     }, [])
 
     return (
         <div>
             <div className='px-5 flex flex-col justify-center items-center h-full'>
-                {/*<Logo/>*/}
-                {/*<GlitterRainBg/>*/}
-
                 <div className='h-[500px]'>
                     <div className='clouds'>
                         <div className='clouds-1'/>
