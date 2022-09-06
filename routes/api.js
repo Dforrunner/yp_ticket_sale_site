@@ -279,13 +279,14 @@ app.post("/create-payment-intent", (req, res) => {
 
         })
         .then(rows => transactionId = rows[0].id)
-        .then(_ =>
-            Promise.all([
-                query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
+        .then(_ => {
+            const queries = [query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
                           VALUES ($1, $2, $3, $4, $5, $6)`,
-                [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]),
-                query('INSERT INTO song_req(transaction_id, name) VALUES($1, $2)', [transactionId, songReq])]
-            )
+                [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]),]
+            if(songReq.replace(" ", '').length())
+                queries.push(query('INSERT INTO song_req(transaction_id, name) VALUES($1, $2)', [transactionId, songReq]))
+             return Promise.all([queries])
+            }
         )
         .then(_ => {
             if (!additionalTickets.length) return;
