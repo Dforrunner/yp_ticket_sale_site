@@ -239,7 +239,7 @@ const Checkout = ({
                 <p className='text-black text-sm text-gray-800 py-6 px-2'>List any song requests below.</p>
                 <InputField
                     type='text'
-                    label="Song Request"
+                    label="Song Request (song 1, song 2, etc.)"
                     name='songRequest'
                 />
             </div>

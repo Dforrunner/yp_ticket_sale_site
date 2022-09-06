@@ -129,7 +129,65 @@ const TransactionTab = ({index, setTab, data, activeTab}) => {
     )
 }
 
-const DashTab = ({index, prevTab, handleTab, setTransactionData, accessLevel}) => {
+
+const SongReqTab = ({index, setTab, data, activeTab}) => {
+    const fixedData = data;
+    const [rows, setRows] = useState(data);
+    const columns = [
+        {field: 'id', headerName: 'ID', width: 50, type: 'number'},
+        {
+            field: 'fullName',
+            headerName: 'Suggested By',
+            description: 'This column has a value getter and is not sortable.',
+            sortable: false,
+            width: 160,
+            valueGetter: (params) =>
+                `${params.row.firstname} ${params.row.lastname}`,
+        },
+        {field: 'song', headerName: 'Song', flex: 1}
+    ];
+
+
+    const handleSearch = (str) => {
+        if (!str) return setRows(data);
+        const filteredRows = fixedData.filter(i => `${i.firstname} ${i.lastname} ${i.song}`.includes(str));
+        setRows(filteredRows);
+    }
+
+    return (
+
+        <div className={`${slideAnimation(index, activeTab)}  w-full h-screen md:mt-10`}>
+            <div
+                className='flex items-center p-3 bg-[#121212] md:bg-[#595959] md:mt-4 h-[50px] cursor-pointer'
+                onClick={() => setTab(0)}
+            >
+                <ArrowBackIcon/>
+                Back
+            </div>
+
+
+            <div className='bg-[#252525] mx-1 my-5 rounded h-[80%]'>
+                <div className='p-4'>
+                    <SearchBar onChange={e => handleSearch(e.target.value)}/>
+                </div>
+
+                <div className='h-[90%]'>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={10}
+                        rowsPerPageOptions={[10, 25, 50, 100, 200]}
+                    />
+                </div>
+
+
+            </div>
+        </div>
+    )
+}
+
+
+const DashTab = ({index, prevTab, handleTab, setTransactionData, setSongReqData, accessLevel}) => {
     const [total, setTotal] = useState(0);
     const [transactionFee, setTransactionFee] = useState(0);
     const [totalTips, setTotalTips] = useState(0);
@@ -169,6 +227,11 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData, accessLevel}) =
                 setTransactionFee(transactionFeeSum.toFixed(2));
                 setTotal(sum.toFixed(2))
             })
+            .catch(console.error)
+
+        fetch('/api/song-requests')
+            .then(res => res.json())
+            .then(res => setSongReqData(res.results))
             .catch(console.error)
     }, []);
 
@@ -237,6 +300,16 @@ const DashTab = ({index, prevTab, handleTab, setTransactionData, accessLevel}) =
 
                         <button className='w-full h-full cursor-pointer' type='button' onClick={() => handleTab(5)}>
                             View Transactions
+                        </button>
+                    </div>
+                </div>
+
+                <div className='sticky bottom-0 mb-10 mt-3'>
+                    <div className='flex justify-center items-center mx-1 bg-[#3071BB]
+                                hover:bg-[#3584DF] h-[60px] text-white rounded'>
+
+                        <button className='w-full h-full cursor-pointer bg-[#09D4CE]' type='button' onClick={() => handleTab(6)}>
+                            View Song Requests
                         </button>
                     </div>
                 </div>
@@ -635,7 +708,8 @@ const Dashboard = () => {
     const [tab, setTab] = useState(0);
     const [prevTab, setPrevTab] = useState(0);
     const [scanData, setScanData] = useState([]);
-    const [transactionData, setTransactionData] = useState([])
+    const [transactionData, setTransactionData] = useState([]);
+    const [songReqData, setSongReqData] = useState([]);
     const auth = useContext(AuthContext);
     const accessLevel = auth.user.access_level;
     const navigate = useNavigate();
@@ -654,6 +728,7 @@ const Dashboard = () => {
                         prevTab={prevTab}
                         handleTab={handleTab}
                         setTransactionData={setTransactionData}
+                        setSongReqData={setSongReqData}
                         accessLevel={accessLevel}
                     />}
 
@@ -702,6 +777,13 @@ const Dashboard = () => {
                         data={transactionData}
                     />}
 
+                    {tab === 6 &&
+                    <SongReqTab
+                        index={6}
+                        activeTab={tab}
+                        setTab={setTab}
+                        data={songReqData}
+                    />}
                 </div>
 
                 <Navbar

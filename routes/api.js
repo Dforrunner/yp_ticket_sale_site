@@ -14,7 +14,9 @@ app.get('/details', (req, res) => {
     query(`
         SELECT *,
                CAST((product.qty -
-                     (SELECT COALESCE(SUM(qty),0) FROM transactions WHERE purchase_confirmed = TRUE)) AS int) AS available_qty
+                     (SELECT COALESCE(SUM(qty), 0)
+                      FROM transactions
+                      WHERE purchase_confirmed = TRUE)) AS int) AS available_qty
         FROM details
                  JOIN product ON product.id = details.id`)
         .then(rows => {
@@ -280,12 +282,12 @@ app.post("/create-payment-intent", (req, res) => {
         })
         .then(rows => transactionId = rows[0].id)
         .then(_ => {
-            const queries = [query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
-                          VALUES ($1, $2, $3, $4, $5, $6)`,
-                [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]),]
-            if(songReq.replace(/\s/g , "").length)
-                queries.push(query('INSERT INTO song_req(transaction_id, name) VALUES($1, $2)', [transactionId, songReq]))
-             return Promise.all([queries])
+                const queries = [query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
+                                        VALUES ($1, $2, $3, $4, $5, $6)`,
+                    [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]),]
+                if (songReq.replace(/\s/g, "").length)
+                    queries.push(query('INSERT INTO song_req(transaction_id, name) VALUES($1, $2)', [transactionId, songReq]))
+                return Promise.all([queries])
             }
         )
         .then(_ => {
@@ -338,6 +340,7 @@ app.post('/transaction', ensureAuthenticated, (req, res) => {
         })
 });
 
+
 /**
  * Get all transactions from the transactions DB table
  */
@@ -352,7 +355,7 @@ app.get('/transactions', ensureAuthenticated, (req, res) => {
                WHERE purchase_confirmed = TRUE`)
     ]
 
-        Promise.all(queries)
+    Promise.all(queries)
         .then(results => {
             res.status(200).json({
                 ...results[0][0],
@@ -367,6 +370,24 @@ app.get('/transactions', ensureAuthenticated, (req, res) => {
         })
 });
 
+
+/**
+ * Get all Song requests from the song_req DB table
+ */
+app.get('/song-requests', ensureAuthenticated, (req, res) => {
+
+    query('SELECT s.transaction_id as id, s.name as song, t.firstname, t.lastname FROM song_req s JOIN transactions t on s.transaction_id = t.id')
+        .then(results => {
+            console.log({results})
+            res.status(200).json({results})
+            res.end()
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500);
+            res.end()
+        })
+});
 
 /**
  * Check-in users - Update DB
