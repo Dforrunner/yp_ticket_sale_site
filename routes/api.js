@@ -283,7 +283,7 @@ app.post("/create-payment-intent", (req, res) => {
             const queries = [query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
                           VALUES ($1, $2, $3, $4, $5, $6)`,
                 [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]),]
-            if(songReq.replace(" ", '').length())
+            if(songReq.replace(/\s/g , "").length)
                 queries.push(query('INSERT INTO song_req(transaction_id, name) VALUES($1, $2)', [transactionId, songReq]))
              return Promise.all([queries])
             }
