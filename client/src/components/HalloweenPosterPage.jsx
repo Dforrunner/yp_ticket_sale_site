@@ -82,9 +82,9 @@ const HalloweenPosterPage = () => {
                 <FullMoon/>
 
                 <div className='z-10'>
-                    <div className='text-center md:mt-[530px] mt-[55px]'>
+                    <div className='text-center md:mt-[500px] mt-[55px]'>
                         <p className='text-[#C65000] font-creepster text-3xl md:text-5xl'>{details.date_time}</p>
-                        <p className='text-[#C65000] text-base'>{details.venue}</p>
+                        <p className='text-[#C65000] text-2xl  text-base'>{details.venue}</p>
                     </div>
 
                     <div className='text-center mt-20'>

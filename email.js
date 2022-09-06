@@ -62,7 +62,7 @@ const send = (transponderNum, qrUrl, {
     return transporter.sendMail({
         from: config.auth.user, // sender address
         to: `${email}, info@ypstl.com`,
-        subject: `✨5K Ball✨ Ticket 💃🕺 - ${firstname} ${lastname}`, // Subject line
+        subject: `👻HALLOWEEN PARTY👻 Ticket 🎃 - ${firstname} ${lastname}`, // Subject line
         html: emailTemplate({
             ticketId,
             title,
@@ -86,6 +86,7 @@ const send = (transponderNum, qrUrl, {
 const sendEmail = (email) =>
     generateTicket(email.ticketId)
         .then(qrUrl => {
+            console.log(qrUrl)
             send(1, qrUrl, email)
                 .catch(error => {
                     console.error(error);

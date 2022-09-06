@@ -242,7 +242,7 @@ app.post("/create-payment-intent", (req, res) => {
     const calTotal = (qty, price, tip) =>
         ((qty * price) + Number(tip ? tip : 0)).toFixed(2);
 
-    const {price, qty, email, firstname, lastname, tipAmount, additionalTickets, waiverData} = req.body;
+    const {price, qty, email, firstname, lastname, tipAmount, additionalTickets, waiverData, songReq} = req.body;
     const total = calTotal(qty, price, tipAmount);
     const userName = `${firstname} ${lastname}`
     let payIntent;
@@ -279,9 +279,14 @@ app.post("/create-payment-intent", (req, res) => {
 
         })
         .then(rows => transactionId = rows[0].id)
-        .then(_ => query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
+        .then(_ =>
+            Promise.all([
+                query(`INSERT INTO waivers(user_name, contact_name, relation, phone, signature, transaction_id)
                           VALUES ($1, $2, $3, $4, $5, $6)`,
-            [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]))
+                [userName, waiverData.eName, waiverData.eRelation, waiverData.eNum, waiverData.signature, transactionId]),
+                query('INSERT INTO song_req(transaction_id, name) VALUES($1, $2)', [transactionId, songReq])]
+            )
+        )
         .then(_ => {
             if (!additionalTickets.length) return;
 

@@ -906,7 +906,7 @@ const FullMoon = () => {
   </g>
 </svg>`
     return (
-        <div className='md:w-full w-[580px] flex flex-row justify-center absolute top-0' dangerouslySetInnerHTML={{__html: body}} />
+        <div className='md:w-full lg:w-[80%] overflow-hidden w-[580px] flex flex-row justify-center absolute top-0' dangerouslySetInnerHTML={{__html: body}} />
     )
 }
 

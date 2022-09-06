@@ -87,6 +87,7 @@ const Checkout = ({
             tipAmount: Number(getVal('tipAmount')),
             additionalTickets: extraTicketUsers,
             total: calTotal(orderQty, price, tip),
+            songReq: getVal('songRequest'),
             waiverData,
             price
         }
@@ -233,6 +234,16 @@ const Checkout = ({
                 />
             </div>
 
+            <div className='w-full mt-6'>
+                <h2 className='text-2xl'>Song Request</h2>
+                <p className='text-black text-sm text-gray-800 py-6 px-2'>List any song requests below.</p>
+                <InputField
+                    type='text'
+                    label="Song Request"
+                    name='songRequest'
+                />
+            </div>
+
             {request_tip &&
             <div className='mt-6'>
                 <h2 className='text-2xl pb-2'>Donation</h2>
@@ -254,7 +265,6 @@ const Checkout = ({
 
 
                 <div className='flex flex-row justify-between mt-5'>
-
                     <FormControl fullWidth sx={{m: 1}}>
                         <InputLabel
                             htmlFor="outlined-adornment-amount">{`${tip ? 'Tip' : 'Custom'} Amount`}</InputLabel>
@@ -273,8 +283,9 @@ const Checkout = ({
                             name='tipAmount'
                         />
                     </FormControl>
-
                 </div>
+
+
             </div>
             }
         </form>
@@ -378,14 +389,18 @@ const OrderSummary = ({
                     </div>
 
                     <div>
-                        {tabIndex === 1 &&
-                        <p className='text-sm p-7'>
-                            By clicking "Pay Now", I accept the Terms of Service and have read the Privacy Policy.
-                        </p>
-                        }
+                        {/*{tabIndex === 1 &&*/}
+                        {/*<p className='text-sm p-7'>*/}
+                        {/*    By clicking "Pay Now", I accept the Terms of Service and have read the Privacy Policy.*/}
+                        {/*</p>*/}
+                        {/*}*/}
 
                         <p className='text-gradient-500 text-center'>{message}</p>
-                        {children}
+
+                        <div className='absolute w-full bottom-0'>
+                            {children}
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -564,7 +579,7 @@ const PurchasePage = () => {
             .catch(err => console.log(err))
 
     return (
-        <div className='text-black md:flex md:justify-center md:items-center min-h-screen bg-white'>
+        <div className={`text-black md:flex md:justify-center md:items-center bg-white min-h-full`}>
             <div className='md:hidden'>
                 <PostImg/>
             </div>
