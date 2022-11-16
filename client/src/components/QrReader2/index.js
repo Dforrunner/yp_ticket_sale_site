@@ -33,19 +33,6 @@ const QrReader = ({
     const els = {};
     let timeout, stopCamera;
 
-    useEffect(() => {
-        initiate()
-
-        return () => {
-            if (timeout)
-                clearTimeout(timeout)
-
-            if (stopCamera)
-                stopCamera()
-        }
-    }, []);
-
-
     const initiate = () => {
         // Check browser facingMode constraint support
         // Firefox ignores facingMode or deviceId constraints
@@ -143,7 +130,7 @@ const QrReader = ({
             preview.readyState === preview.HAVE_ENOUGH_DATA
 
         if (previewIsPlaying) {
-            const ctx = canvas.getContext('2d')
+            const ctx = canvas.getContext('2d', {willReadFrequently: true})
 
             const decode = () => {
                 ctx.drawImage(preview, hozOffset, vertOffset, width, height)
@@ -204,6 +191,19 @@ const QrReader = ({
         width: '100%',
         height: '60%'
     }
+
+    useEffect(() => {
+        initiate()
+
+        return () => {
+            if (timeout)
+                clearTimeout(timeout)
+
+            if (stopCamera)
+                stopCamera()
+        }
+    }, []);
+
 
     return (
         <section className={className} style={style}>
