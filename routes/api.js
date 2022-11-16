@@ -261,7 +261,7 @@ app.post("/create-payment-intent", (req, res) => {
             }
 
             return stripe.paymentIntents.create({
-                amount: total * 100,
+                amount: (total * 100).toFixed(0),
                 currency: "usd",
                 payment_method_types: ['card'],
                 receipt_email: email,
