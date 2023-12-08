@@ -1,10 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comforter&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Quintessential&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Mystery+Quest&display=swap');
-@import url("https://fonts.googleapis.com/css?family=Raleway:900");
-@import url("https://fonts.googleapis.com/css?family=Oswald");
+@import url('https://fonts.googleapis.com/css?family=Raleway:900');
+@import url('https://fonts.googleapis.com/css?family=Oswald');
 
 * html {
   padding: 0;
@@ -12,13 +12,14 @@
   box-sizing: border-box;
 }
 
-textarea:focus, input:focus{
+textarea:focus,
+input:focus {
   outline: none;
 }
 
 body {
   margin: 0;
-  font-family: "Open Sans", sans-serif;
+  font-family: 'Open Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -41,18 +42,17 @@ body {
 
 .text-gold {
   background-image: linear-gradient(
-          to right,
-          #533634 0,
-          #cb9b51 22%,
-          #f6e27a 45%,
-          #f6f2c0 50%,
-          #f6e27a 55%,
-          #cb9b51 78%,
-          #664443 110%
+    to right,
+    #533634 0,
+    #cb9b51 22%,
+    #f6e27a 45%,
+    #f6f2c0 50%,
+    #f6e27a 55%,
+    #cb9b51 78%,
+    #664443 110%
   );
-  color:transparent;
-  -webkit-background-clip:text;
-
+  color: transparent;
+  -webkit-background-clip: text;
 }
 
 .bg-purple {
@@ -64,38 +64,66 @@ body {
 }
 
 .bg-gold {
-  background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
-  radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
+  background: radial-gradient(
+      ellipse farthest-corner at right bottom,
+      #fedb37 0%,
+      #fdb931 8%,
+      #9f7928 30%,
+      #8a6e2f 40%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse farthest-corner at left top,
+      #ffffff 0%,
+      #ffffac 8%,
+      #d1b464 25%,
+      #5d4a1f 62.5%,
+      #5d4a1f 100%
+    );
 }
 
 .bg-gold:hover {
-  background: radial-gradient(ellipse farthest-corner at right bottom, #ffd000 0%, #e09904 8%, #84631d 30%, #6c5523 40%, transparent 80%),
-  radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #e3e321 8%, #d9ab24 25%, #362a0c 62.5%, #5d4a1f 100%);
+  background: radial-gradient(
+      ellipse farthest-corner at right bottom,
+      #ffd000 0%,
+      #e09904 8%,
+      #84631d 30%,
+      #6c5523 40%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse farthest-corner at left top,
+      #ffffff 0%,
+      #e3e321 8%,
+      #d9ab24 25%,
+      #362a0c 62.5%,
+      #5d4a1f 100%
+    );
 }
 
 .gradient-bg-welcome {
   background-color: #0f0e13;
   background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
-  radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
-  radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
 }
 
 .gradient-bg-services {
   background-color: #0f0e13;
   background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
-  radial-gradient(at 50% 100%, hsla(225, 39%, 25%, 1) 0, transparent 50%);
+    radial-gradient(at 50% 100%, hsla(225, 39%, 25%, 1) 0, transparent 50%);
 }
 
 .gradient-bg-transactions {
   background-color: #0f0e13;
   background-image: radial-gradient(at 0% 100%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
-  radial-gradient(at 50% 0%, hsla(225, 39%, 25%, 1) 0, transparent 50%);
+    radial-gradient(at 50% 0%, hsla(225, 39%, 25%, 1) 0, transparent 50%);
 }
 
 .gradient-bg-footer {
   background-color: #0f0e13;
   background-image: radial-gradient(at 0% 100%, hsla(253, 16%, 7%, 1) 0, transparent 53%),
-  radial-gradient(at 50% 150%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+    radial-gradient(at 50% 150%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
 }
 
 .blue-glassmorphism {
@@ -118,17 +146,18 @@ body {
 .eth-card {
   background-color: #a099ff;
   background-image: radial-gradient(at 83% 67%, rgb(152, 231, 156) 0, transparent 58%),
-  radial-gradient(at 67% 20%, hsla(357, 94%, 71%, 1) 0, transparent 59%),
-  radial-gradient(at 88% 35%, hsla(222, 81%, 65%, 1) 0, transparent 50%),
-  radial-gradient(at 31% 91%, hsla(9, 61%, 61%, 1) 0, transparent 52%),
-  radial-gradient(at 27% 71%, hsla(336, 91%, 65%, 1) 0, transparent 49%),
-  radial-gradient(at 74% 89%, hsla(30, 98%, 65%, 1) 0, transparent 51%),
-  radial-gradient(at 53% 75%, hsla(174, 94%, 68%, 1) 0, transparent 45%);
+    radial-gradient(at 67% 20%, hsla(357, 94%, 71%, 1) 0, transparent 59%),
+    radial-gradient(at 88% 35%, hsla(222, 81%, 65%, 1) 0, transparent 50%),
+    radial-gradient(at 31% 91%, hsla(9, 61%, 61%, 1) 0, transparent 52%),
+    radial-gradient(at 27% 71%, hsla(336, 91%, 65%, 1) 0, transparent 49%),
+    radial-gradient(at 74% 89%, hsla(30, 98%, 65%, 1) 0, transparent 51%),
+    radial-gradient(at 53% 75%, hsla(174, 94%, 68%, 1) 0, transparent 45%);
 }
 
 .text-gradient {
   background-color: #fff;
-  background-image: radial-gradient(at 4% 36%, hsla(0, 0%, 100%, 1) 0, transparent 53%), radial-gradient(at 100% 60%, rgb(0, 0, 0) 0, transparent 50%);
+  background-image: radial-gradient(at 4% 36%, hsla(0, 0%, 100%, 1) 0, transparent 53%),
+    radial-gradient(at 100% 60%, rgb(0, 0, 0) 0, transparent 50%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -163,7 +192,6 @@ body {
 :root {
   --colorText: white !important;
 }
-
 
 #payment-form button:disabled {
   opacity: 0.5;
@@ -238,8 +266,6 @@ body {
   }
 }
 
-
-
 .lds-ring {
   display: inline-block;
   position: relative;
@@ -274,7 +300,6 @@ body {
     transform: rotate(360deg);
   }
 }
-
 
 .slideInLeft {
   animation-duration: 1s;
@@ -312,10 +337,9 @@ body {
   }
 }
 
-
 /**Halloween Styles **/
 .spooky-bg {
-  background: rgb(50,50,50);
+  background: rgb(50, 50, 50);
 }
 
 @keyframes clouds-loop-1 {
@@ -324,7 +348,7 @@ body {
   }
 }
 .clouds-1 {
-  background-image: url("https://s.cdpn.io/15514/clouds_2.png");
+  background-image: url('https://s.cdpn.io/15514/clouds_2.png');
   animation: clouds-loop-1 20s infinite linear;
 }
 
@@ -334,7 +358,7 @@ body {
   }
 }
 .clouds-2 {
-  background-image: url("https://s.cdpn.io/15514/clouds_1.png");
+  background-image: url('https://s.cdpn.io/15514/clouds_1.png');
   animation: clouds-loop-2 15s infinite linear;
 }
 
@@ -344,7 +368,7 @@ body {
   }
 }
 .clouds-3 {
-  background-image: url("https://s.cdpn.io/15514/clouds_3.png");
+  background-image: url('https://s.cdpn.io/15514/clouds_3.png');
   animation: clouds-loop-3 17s infinite linear;
 }
 

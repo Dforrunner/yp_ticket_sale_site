@@ -1,92 +1,79 @@
-import React, {createRef, useEffect, useState} from 'react'
-import jsQR from 'jsqr'
-import Webcam from "react-webcam";
+import React, { createRef, useEffect, useState } from 'react';
+import jsQR from 'jsqr';
+import Webcam from 'react-webcam';
 
-const {requestAnimationFrame} = global
+const { requestAnimationFrame } = global;
 
-const QRScan = ({onFind}) => {
+const QRScan = ({ onFind }) => {
+  const [loading, setLoading] = useState(true);
+  const [notEnabled, setNotEnabled] = useState(true);
 
-    const [loading, setLoading] = useState(true);
-    const [notEnabled, setNotEnabled] = useState(true);
+  const canvasRef = createRef();
 
-    const canvasRef = createRef();
+  useEffect(() => {
+    const video = document.createElement('video');
+    video.autoplay = true;
 
-    useEffect(() => {
-        const video = document.createElement('video');
-        video.autoplay = true;
+    const ratio = window.devicePixelRatio;
 
-        const ratio = window.devicePixelRatio;
+    const canvas = canvasRef.current;
 
-        const canvas = canvasRef.current;
+    const canvasWidth = window.screen.width * ratio;
+    const canvasHeight = window.screen.height * ratio;
 
-        const canvasWidth = window.screen.width * ratio;
-        const canvasHeight = window.screen.height * ratio;
+    console.log({ canvasWidth, canvasHeight });
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight - 150;
 
-        console.log({canvasWidth, canvasHeight})
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight - 150;
+    const context = canvas.getContext('2d');
 
-        const context = canvas.getContext('2d');
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+          video.setAttribute('playsinline', true);
+          video.play();
+          requestAnimationFrame(tick);
+        })
+        .catch((err) => console.log(err));
+    }
 
-        if (navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    video.srcObject = stream
-                    video.setAttribute('playsinline', true)
-                    video.play()
-                    requestAnimationFrame(tick)
-                })
-                .catch(err => console.log(err));
-        }
+    const tick = () => {
+      if (notEnabled) setNotEnabled(false);
 
-        const tick = () => {
-            if (notEnabled) setNotEnabled(false);
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        if (loading) setLoading(false);
 
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                if (loading) setLoading(false);
+        context.drawImage(video, 0, 0, canvasWidth, canvasHeight);
+        const imageData = canvas.getImageData(0, 0, canvasWidth, canvasHeight);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+        if (code) onFind(code.data);
+      }
+      requestAnimationFrame(tick);
+    };
 
-                context.drawImage(video, 0, 0, canvasWidth, canvasHeight)
-                const imageData = canvas.getImageData(0, 0, canvasWidth, canvasHeight)
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: 'dontInvert'
-                })
-                if (code) onFind(code.data)
-            }
-            requestAnimationFrame(tick)
-        }
+    return () => {
+      const stream = video.srcObject;
+      const tracks = stream.getTracks();
 
-        return () => {
-            const stream = video.srcObject;
-            const tracks = stream.getTracks();
+      for (let i = 0; i < tracks.length; i++) {
+        let track = tracks[i];
+        track.stop();
+      }
 
-            for (let i = 0; i < tracks.length; i++) {
-                let track = tracks[i];
-                track.stop();
-            }
+      video.srcObject = null;
+    };
+  }, []);
 
-            video.srcObject = null;
-        };
+  return (
+    <div>
+      <h1>CAMERA</h1>
+      <Webcam />;
+    </div>
+  );
+};
 
-    }, []);
-
-    return (
-        <div>
-            {/*{notEnabled && <p>Unable to access camera</p>}*/}
-            {/*{loading && <p>Loading video...</p>}*/}
-            {/*<canvas*/}
-            {/*    ref={canvasRef}*/}
-            {/*    style={{*/}
-            {/*        position: 'fixed',*/}
-            {/*        top: 0,*/}
-            {/*        left: 0,*/}
-            {/*        width: '100%',*/}
-            {/*        height: '100%',*/}
-            {/*        zIndex: 0*/}
-            {/*    }}/>*/}
-            <h1>CAMERA</h1>
-            <Webcam />;
-        </div>
-    )
-}
-
-export default QRScan
+export default QRScan;

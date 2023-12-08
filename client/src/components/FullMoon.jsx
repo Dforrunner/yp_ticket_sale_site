@@ -1,11 +1,6 @@
-
-
 const FullMoon = () => {
-    //654 768
-    const width = window.innerWidth > 600;
-    const height = 1300;//width='${width}px' height='${height}px'
 
-    const body =`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width='100%' height='100%' viewBox="0 0 833 1019">
+  const body = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width='100%' height='100%' viewBox="0 0 833 1019">
   <defs>
     <radialGradient id="a" cx="297.55" cy="265.38" r="91.96" fx="297.55" fy="265.38" gradientTransform="matrix(1.17 0 0 1.17 -74.54 -62.14)" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#7d7d7f"/>
@@ -904,10 +899,13 @@ const FullMoon = () => {
     <path fill="#050d12" d="M363.14 13.49s-.02-.07 0 .02v-.02Zm-.16-.47.45.65-.54-.54.09-.1Zm28.31 2.83.14-.31-.14.31Zm.13-.3.14-.16v.16h-.14Z"/>
     <path fill="#9188a4" d="M420.97 36.97v.01Zm-47.56-.72s.07.1-.05-.07l.03.09.02-.02Z"/>
   </g>
-</svg>`
-    return (
-        <div className='md:w-full lg:w-[80%] overflow-hidden w-[580px] flex flex-row justify-center absolute top-0' dangerouslySetInnerHTML={{__html: body}} />
-    )
-}
+</svg>`;
+  return (
+    <div
+      className='md:w-full lg:w-[80%] overflow-hidden w-[580px] flex flex-row justify-center absolute top-0'
+      dangerouslySetInnerHTML={{ __html: body }}
+    />
+  );
+};
 
 export default FullMoon;

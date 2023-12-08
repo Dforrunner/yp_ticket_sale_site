@@ -5,9 +5,9 @@ const session = require("express-session");
 const PostgreSqlStore = require('connect-pg-simple')(session);
 const passport = require('passport')
 require('dotenv').config();
-const {db} = require('./db');
+const {db} = require('./lib/db');
 const moment = require('moment');
-const {configPassport} = require('./auth');
+const { configPassport } = require('./lib/auth');
 const path = require("path");
 const httpsRedirect = require('./express-middleware/https-redirect');
 

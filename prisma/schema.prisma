@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model transactions {
+  id                 Int       @id @default(autoincrement())
+  firstname          String
+  lastname           String
+  price              Decimal
+  ticket_id          Int
+  transaction_id     String
+  qty                Int
+  total_paid         Decimal
+  tip                Decimal
+  email              String
+  email_sent         Boolean   @default(false)
+  checked_in         Boolean   @default(false)
+  checked_in_on      Boolean?
+  checked_in_by      Int?
+  purchased_on       DateTime? @default(now())
+  purchase_confirmed Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model waivers {
+  id             Int      @id @default(autoincrement())
+  user_name      String
+  contact_name   String
+  relation       String
+  phone          String
+  signature      String
+  transaction_id String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model product {
+  id         Int       @id @default(autoincrement())
+  qty        Int
+  venue      String?
+  price      String?
+  next_price String?
+  dj_name    String?
+  dj_ig      String?
+  on_sale    Boolean   @default(false)
+  yp_link    String?
+  sale_exp   DateTime?
+  date_time  DateTime?
+}
+
+model users {
+  id        Int    @id @default(autoincrement())
+  username  String
+  pass      String
+  firstname String
+  lastname  String
+}
+
+model song_req {
+  id             Int    @id @default(autoincrement())
+  transaction_id String
+  name           String
+}
+
+model extra_tickets {
+  id            Int      @id @default(autoincrement())
+  full_name     String
+  buyer_id      Int
+  checked_in    Boolean  @default(false)
+  checked_in_on Boolean?
+  checked_in_by Int?
+}
